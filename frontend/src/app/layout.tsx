@@ -4,7 +4,6 @@ import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/providers/auth-provider";
 import { Toaster } from "react-hot-toast";
-import { Toaster } from "react-hot-toast";
 
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";

@@ -7,12 +7,29 @@ import { useCart } from "@/hooks/useCart";
 import { ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
+import api from "@/lib/api";
 import { triggerStars } from "@/lib/confetti";
 
 export default function Home() {
   const { products, isLoading } = useProducts();
   const { addToCart } = useCart();
   const [addingId, setAddingId] = useState<number | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchNotice = async () => {
+      try {
+        const res = await api.get("/store/notice");
+        if (res.data && res.data.is_active && res.data.message) {
+          setNotice(res.data.message);
+        }
+      } catch (err) {
+        console.error("No active notice or error fetching.");
+      }
+    };
+    fetchNotice();
+  }, []);
 
   const handleAddToCart = async (e: React.MouseEvent, productId: number) => {
     e.preventDefault();
@@ -48,6 +65,13 @@ export default function Home() {
           {/* Logo image will take center stage, text removed as requested */}
         </div>
       </section>
+
+      {/* Notice Banner */}
+      {notice && (
+        <section className="bg-lunart-pink-500 text-white font-bold text-center py-4 px-6 rounded-2xl shadow-lg animate-fade-in border border-lunart-pink-400">
+          <p className="text-lg tracking-wide uppercase">{notice}</p>
+        </section>
+      )}
 
       {/* Products Section */}
       <section>

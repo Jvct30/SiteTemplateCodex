@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
+import shutil
+import uuid
 
 from src.core.dependencies import get_db, require_admin
 from src.models.user import User
@@ -19,6 +21,8 @@ from src.schemas.custom_request import (
 from src.schemas.message import MessageCreate, MessageResponse, MessageUpdate
 from src.schemas.order import OrderResponse
 from src.schemas.product import ProductCreate, ProductResponse, ProductUpdate
+from src.models.notice import Notice
+from src.schemas.notice import NoticeCreate, NoticeResponse
 from src.services.coupon_service import CouponService
 from src.services.custom_request_service import CustomRequestService
 from src.services.message_service import MessageService
@@ -42,6 +46,42 @@ def get_coupon_service(db: AsyncSession = Depends(get_db)) -> CouponService:
 
 def get_custom_request_service(db: AsyncSession = Depends(get_db)) -> CustomRequestService:
     return CustomRequestService(CustomRequestRepository(db))
+
+# -----------------
+# UPLOAD
+# -----------------
+@router.post("/upload-image")
+async def upload_image(file: UploadFile = File(...)):
+    ext = file.filename.split(".")[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    path = f"uploads/{filename}"
+    with open(path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    return {"url": f"http://localhost:8000/static/{filename}"}
+
+# -----------------
+# STORE NOTICE
+# -----------------
+@router.post("/notice", response_model=NoticeResponse)
+async def create_notice(data: NoticeCreate, db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import update
+    # Inactive previous notices to ensure only one active
+    stmt = update(Notice).values(is_active=False)
+    await db.execute(stmt)
+    
+    notice = Notice(message=data.message, is_active=data.is_active)
+    db.add(notice)
+    await db.commit()
+    await db.refresh(notice)
+    return notice
+
+@router.delete("/notice")
+async def clear_notices(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import update
+    stmt = update(Notice).values(is_active=False)
+    await db.execute(stmt)
+    await db.commit()
+    return {"message": "Avisos desativados"}
 
 # -----------------
 # PRODUCTS

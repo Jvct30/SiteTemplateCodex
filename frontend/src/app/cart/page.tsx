@@ -141,8 +141,8 @@ export default function CartPage() {
               onChange={(e) => calculateShipping(e.target.value)}
               className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-2 focus:outline-none focus:border-lunart-pink-400"
             >
-              <option value="mercado_envios">Mercado Pago (Envio)</option>
-              <option value="pickup">Retirada no Local</option>
+              <option value="mercado_envios">Correios (Sedex / PAC)</option>
+              <option value="pickup">Retirar na Loja (Chat para agendar)</option>
             </select>
           </div>
           

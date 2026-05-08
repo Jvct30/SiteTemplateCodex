@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+import os
 
 from src.core.config import settings
 from src.core.exceptions import (
@@ -15,6 +17,7 @@ from src.core.exceptions import (
 )
 from src.models.base import Base
 from src.models.db import engine
+from src.models.notice import Notice
 from src.routers import (
     admin_router,
     auth_router,
@@ -25,6 +28,7 @@ from src.routers import (
     order_router,
     product_router,
     shipping_router,
+    store_router,
     user_router,
 )
 
@@ -34,10 +38,13 @@ logger = logging.getLogger("lunart")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # In a real app we rely on Alembic for migrations, 
-    # but we can also ensure tables are created here if desired.
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.create_all)
+    # Ensure uploads directory exists
+    os.makedirs("uploads", exist_ok=True)
+    
+    # Auto-create tables for simplicity (Notices, etc)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        
     logger.info("Lunart Backend Started 🚀")
     yield
     await engine.dispose()
@@ -58,6 +65,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static Files for Image Uploads
+app.mount("/static", StaticFiles(directory="uploads"), name="static")
 
 # Global Exception Handlers
 @app.exception_handler(Exception)
@@ -94,6 +104,7 @@ app.include_router(user_router.router)
 app.include_router(product_router.router)
 app.include_router(cart_router.router)
 app.include_router(shipping_router.router)
+app.include_router(store_router.router)
 app.include_router(coupon_router.router)
 app.include_router(order_router.router)
 app.include_router(message_router.router)

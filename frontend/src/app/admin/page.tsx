@@ -16,6 +16,48 @@ export default function AdminPage() {
   const [productDesc, setProductDesc] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [variations, setVariations] = useState("");
+  
+  const [uploading, setUploading] = useState(false);
+  const [noticeText, setNoticeText] = useState("");
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await api.post("/admin/upload-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      setImageUrl(res.data.url);
+      toast.success("Imagem enviada com sucesso!");
+    } catch (err) {
+      toast.error("Erro ao enviar imagem.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSaveNotice = async () => {
+    if (!noticeText.trim()) return toast.error("Digite um aviso!");
+    try {
+      await api.post("/admin/notice", { message: noticeText, is_active: true });
+      toast.success("Aviso ativado com sucesso!");
+      setNoticeText("");
+    } catch (err) {
+      toast.error("Erro ao ativar aviso.");
+    }
+  };
+
+  const handleRemoveNotice = async () => {
+    try {
+      await api.delete("/admin/notice");
+      toast.success("Aviso removido!");
+    } catch (err) {
+      toast.error("Erro ao remover aviso.");
+    }
+  };
 
   if (isLoading) return null;
   if (!isAuthenticated || user?.role !== "admin") {
@@ -70,8 +112,10 @@ export default function AdminPage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs mb-1">URL da Imagem (Cloudinary)</label>
-              <input type="url" value={imageUrl} onChange={e=>setImageUrl(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" placeholder="https://res.cloudinary.com/..." />
+              <label className="block text-xs mb-1">Upload de Imagem</label>
+              <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm text-lunart-white/60 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-lunart-purple-600 file:text-white hover:file:bg-lunart-purple-500" />
+              {uploading && <span className="text-xs text-lunart-pink-400 mt-1 block">Enviando...</span>}
+              {imageUrl && <span className="text-xs text-green-400 mt-1 block">Imagem pronta! ({imageUrl})</span>}
             </div>
             <div>
               <label className="block text-xs mb-1">Variações (Separadas por vírgula)</label>
@@ -87,10 +131,22 @@ export default function AdminPage() {
 
         {/* Info Box */}
         <div className="flex flex-col gap-8">
+          {/* Notice Box */}
           <div className="glass p-6 rounded-3xl">
-            <h2 className="text-xl font-bold mb-4">Avisos</h2>
+            <h2 className="text-xl font-bold mb-4">Aviso da Loja (Homepage)</h2>
+            <div className="flex flex-col gap-3">
+              <input type="text" value={noticeText} onChange={e=>setNoticeText(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" placeholder="Ex: Estamos em promoção! Use o cupom ESTRELA" />
+              <div className="flex gap-2">
+                <button onClick={handleSaveNotice} className="bg-lunart-purple-600 hover:bg-lunart-purple-500 px-4 py-2 rounded-lg font-bold text-xs flex-1">Ativar Aviso</button>
+                <button onClick={handleRemoveNotice} className="bg-red-500/20 text-red-300 border border-red-500/50 hover:bg-red-500/30 px-4 py-2 rounded-lg font-bold text-xs flex-1">Remover Aviso</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass p-6 rounded-3xl">
+            <h2 className="text-xl font-bold mb-4">Avisos Sistema</h2>
             <p className="text-sm text-lunart-white/60 mb-2">
-              Para funcionalidades completas de gestão (Pedidos, Cupons, Chats, upload direto pro Cloudinary), expanda os endpoints do <code>admin_router.py</code> consumindo-os aqui.
+              Para funcionalidades completas de gestão (Pedidos, Cupons, Chats), expanda os endpoints consumindo-os aqui.
             </p>
           </div>
         </div>

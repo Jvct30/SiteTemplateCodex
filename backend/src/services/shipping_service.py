@@ -13,8 +13,8 @@ class ShippingService:
     }
 
     LABELS = {
-        "mercado_envios": "Mercado Pago (Envio)",
-        "pickup": "Retirada no Local",
+        "mercado_envios": "Correios (Sedex / PAC)",
+        "pickup": "Retirar na Loja",
     }
 
     async def calculate(self, method: str) -> ShippingCalculateResponse:

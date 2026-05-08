@@ -40,18 +40,12 @@ export default function ProductDetails() {
         
         {/* Imagem */}
         <div className="relative aspect-square rounded-2xl overflow-hidden bg-lunart-surface-light border border-lunart-purple-500/20">
-          {product.image_url ? (
-            <Image
-              src={product.image_url}
-              alt={product.name}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-lunart-white/20">
-              Sem imagem
-            </div>
-          )}
+          <Image
+            src={product.image_url || "/Lunart-Header.jpg"}
+            alt={product.name}
+            fill
+            className="object-cover"
+          />
         </div>
 
         {/* Detalhes */}

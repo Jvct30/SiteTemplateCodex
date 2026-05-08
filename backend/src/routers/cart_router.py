@@ -45,13 +45,14 @@ async def add_item(
     cart_service: CartService = Depends(get_cart_service)
 ):
     item = await cart_service.add_item(current_user.id, data.product_id, data.quantity)
-    subtotal = item.product.price * item.quantity
+    product = await cart_service.product_repo.get_by_id(data.product_id)
+    subtotal = product.price * item.quantity
     return CartItemResponse(
         id=item.id,
         product_id=item.product_id,
-        product_name=item.product.name,
-        product_price=item.product.price,
-        product_image_url=item.product.image_url,
+        product_name=product.name,
+        product_price=product.price,
+        product_image_url=product.image_url,
         quantity=item.quantity,
         subtotal=subtotal
     )
@@ -64,13 +65,14 @@ async def update_item(
     cart_service: CartService = Depends(get_cart_service)
 ):
     item = await cart_service.update_item_quantity(current_user.id, item_id, data.quantity)
-    subtotal = item.product.price * item.quantity
+    product = await cart_service.product_repo.get_by_id(item.product_id)
+    subtotal = product.price * item.quantity
     return CartItemResponse(
         id=item.id,
         product_id=item.product_id,
-        product_name=item.product.name,
-        product_price=item.product.price,
-        product_image_url=item.product.image_url,
+        product_name=product.name,
+        product_price=product.price,
+        product_image_url=product.image_url,
         quantity=item.quantity,
         subtotal=subtotal
     )

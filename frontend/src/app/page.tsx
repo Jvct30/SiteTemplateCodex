@@ -37,12 +37,7 @@ export default function Home() {
           priority
         />
         <div className="relative z-10 px-4">
-          <h1 className="text-5xl md:text-7xl font-display font-bold mb-4 drop-shadow-xl text-transparent bg-clip-text bg-lunart-gradient">
-            Descubra o Infinito
-          </h1>
-          <p className="text-xl md:text-2xl text-lunart-white/90 drop-shadow-md">
-            Artesanatos celestiais e exclusivos para a sua casa.
-          </p>
+          {/* Logo image will take center stage, text removed as requested */}
         </div>
       </section>
 
@@ -50,7 +45,7 @@ export default function Home() {
       <section>
         <h2 className="text-3xl font-display font-semibold mb-8 flex items-center gap-3">
           <span className="w-2 h-8 bg-lunart-purple-500 rounded-full inline-block"></span>
-          Novidades Celestiais
+          Produtos
         </h2>
 
         {isLoading ? (
@@ -66,18 +61,12 @@ export default function Home() {
                 className="group glass rounded-2xl overflow-hidden hover:border-lunart-pink-400 transition-all hover:shadow-[0_0_20px_rgba(236,72,153,0.2)] animate-slide-up"
               >
                 <div className="aspect-square relative overflow-hidden bg-lunart-surface-light">
-                  {product.image_url ? (
-                    <Image
-                      src={product.image_url}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-lunart-white/20">
-                      Sem imagem
-                    </div>
-                  )}
+                  <Image
+                    src={product.image_url || "/Lunart-Header.jpg"}
+                    alt={product.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
                 <div className="p-4">
                   <h3 className="text-lg font-semibold truncate mb-1">{product.name}</h3>

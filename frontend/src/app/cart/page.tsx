@@ -87,9 +87,7 @@ export default function CartPage() {
         {cart.items.map((item) => (
           <div key={item.id} className="glass p-4 rounded-2xl flex items-center gap-4">
             <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-lunart-surface-light shrink-0">
-              {item.product_image_url && (
-                <Image src={item.product_image_url} alt={item.product_name} fill className="object-cover" />
-              )}
+              <Image src={item.product_image_url || "/Lunart-Header.jpg"} alt={item.product_name} fill className="object-cover" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-lg">{item.product_name}</h3>

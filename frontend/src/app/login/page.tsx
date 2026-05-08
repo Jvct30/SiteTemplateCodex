@@ -14,7 +14,6 @@ export default function LoginPage() {
   const router = useRouter();
   
   const [isLogin, setIsLogin] = useState(true);
-  const [isLogin, setIsLogin] = useState(true);
   
   // Login State
   const [username, setUsername] = useState("");
@@ -128,7 +127,7 @@ export default function LoginPage() {
               <label className="block text-sm font-medium mb-1">Data Nascimento</label>
               <DatePicker 
                 selected={birthDate} 
-                onChange={(date) => setBirthDate(date)} 
+                onChange={(date: Date | null) => setBirthDate(date)} 
                 locale={ptBR}
                 dateFormat="dd/MM/yyyy"
                 placeholderText="dd/mm/aaaa"

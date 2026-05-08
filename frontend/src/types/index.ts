@@ -25,6 +25,7 @@ export interface ProductResponse {
   image_url: string | null;
   is_active: boolean;
   created_at: string;
+  variations?: string[] | null;
 }
 
 export interface CartItemResponse {
@@ -35,6 +36,7 @@ export interface CartItemResponse {
   product_image_url: string | null;
   quantity: number;
   subtotal: number;
+  variation?: string | null;
 }
 
 export interface CartResponse {
@@ -48,6 +50,7 @@ export interface OrderItemResponse {
   product_id: number;
   quantity: number;
   unit_price: number;
+  variation?: string | null;
 }
 
 export interface OrderResponse {

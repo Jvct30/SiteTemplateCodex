@@ -17,8 +17,8 @@ export function useCart() {
   });
 
   const addToCartMutation = useMutation({
-    mutationFn: async ({ productId, quantity }: { productId: number; quantity: number }) => {
-      const res = await api.post("/cart/items", { product_id: productId, quantity });
+    mutationFn: async ({ productId, quantity, variation }: { productId: number; quantity: number; variation?: string }) => {
+      const res = await api.post("/cart/items", { product_id: productId, quantity, variation });
       return res.data;
     },
     onSuccess: () => {

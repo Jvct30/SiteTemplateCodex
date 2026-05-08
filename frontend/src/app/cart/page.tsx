@@ -13,7 +13,7 @@ export default function CartPage() {
   const { cart, isLoading, updateQuantity, removeItem } = useCart();
   const { checkout, isPending } = useCheckout();
   
-  const [shippingMethod, setShippingMethod] = useState("sedex");
+  const [shippingMethod, setShippingMethod] = useState("mercado_envios");
   const [couponCode, setCouponCode] = useState("");
   const [shippingCost, setShippingCost] = useState(25.90);
   const [discountPercent, setDiscountPercent] = useState(0);
@@ -51,8 +51,15 @@ export default function CartPage() {
         coupon_code: couponCode || undefined 
       });
       // Redirect to mock payment link
-      if (order.payment_link) {
-        window.location.href = order.payment_link;
+      if (shippingMethod === "pickup") {
+        toast.success("Pedido gerado! Um chat foi criado na aba de Perfil para agendar a retirada.", { duration: 4000 });
+        setTimeout(() => {
+          if (order.payment_link) window.location.href = order.payment_link;
+        }, 4000);
+      } else {
+        if (order.payment_link) {
+          window.location.href = order.payment_link;
+        }
       }
     } catch (err: any) {
       toast.error(err.response?.data?.detail || "Erro ao finalizar compra");
@@ -134,9 +141,8 @@ export default function CartPage() {
               onChange={(e) => calculateShipping(e.target.value)}
               className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-2 focus:outline-none focus:border-lunart-pink-400"
             >
-              <option value="sedex">Sedex</option>
-              <option value="pickup">Retirada na Loja</option>
-              <option value="uber_flash">Uber Flash</option>
+              <option value="mercado_envios">Mercado Pago (Envio)</option>
+              <option value="pickup">Retirada no Local</option>
             </select>
           </div>
           

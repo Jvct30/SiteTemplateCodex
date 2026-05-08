@@ -6,9 +6,12 @@ from src.repositories.interfaces.i_cart_repo import ICartRepository
 from src.repositories.interfaces.i_coupon_repo import ICouponRepository
 from src.repositories.interfaces.i_order_repo import IOrderRepository
 from src.repositories.interfaces.i_product_repo import IProductRepository
+from src.repositories.interfaces.i_custom_request_repo import ICustomRequestRepository
 from src.schemas.order import CheckoutRequest
 from src.services.coupon_service import CouponService
 from src.services.shipping_service import ShippingService
+from src.services.custom_request_service import CustomRequestService
+from src.schemas.custom_request import CustomRequestCreate
 
 
 class OrderService:
@@ -20,12 +23,14 @@ class OrderService:
         cart_repo: ICartRepository,
         product_repo: IProductRepository,
         coupon_repo: ICouponRepository,
+        custom_request_repo: ICustomRequestRepository,
     ):
         self.order_repo = order_repo
         self.cart_repo = cart_repo
         self.product_repo = product_repo
         self.coupon_service = CouponService(coupon_repo)
         self.shipping_service = ShippingService()
+        self.custom_request_service = CustomRequestService(custom_request_repo)
 
     async def get_order(self, order_id: int, user_id: int | None = None, is_admin: bool = False) -> Order:
         order = await self.order_repo.get_by_id(order_id)
@@ -121,7 +126,14 @@ class OrderService:
         # 7. Clear Cart
         await self.cart_repo.clear(cart.id)
         
-        # 8. Mock Payment Link
+        # 8. Handle Pickup Chat Auto-creation
+        if data.shipping_method == "pickup":
+            subject = f"Agendamento de Retirada - Pedido #{order.id}"
+            msg = f"Olá! Seu pedido #{order.id} foi registrado com sucesso. Por favor, nos informe por este chat qual o melhor dia e horário para você vir retirar os produtos!"
+            create_schema = CustomRequestCreate(subject=subject, message=msg)
+            await self.custom_request_service.create_request(user_id, create_schema)
+
+        # 9. Mock Payment Link
         order.payment_link = f"https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=mock_{order.id}"
 
         # Reload fully populated

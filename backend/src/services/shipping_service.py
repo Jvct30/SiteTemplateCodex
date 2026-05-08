@@ -8,15 +8,13 @@ class ShippingService:
     """Service layer for Shipping business logic (Mocked)."""
 
     SHIPPING_RATES = {
-        "sedex": Decimal("25.90"),
+        "mercado_envios": Decimal("25.90"),
         "pickup": Decimal("0.00"),
-        "uber_flash": Decimal("18.50"),
     }
 
     LABELS = {
-        "sedex": "Sedex",
-        "pickup": "Retirada na Loja",
-        "uber_flash": "Uber Flash (Você solicita o envio)",
+        "mercado_envios": "Mercado Pago (Envio)",
+        "pickup": "Retirada no Local",
     }
 
     async def calculate(self, method: str) -> ShippingCalculateResponse:

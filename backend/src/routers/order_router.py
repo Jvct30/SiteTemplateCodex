@@ -7,6 +7,7 @@ from src.repositories.cart_repo import CartRepository
 from src.repositories.coupon_repo import CouponRepository
 from src.repositories.order_repo import OrderRepository
 from src.repositories.product_repo import ProductRepository
+from src.repositories.custom_request_repo import CustomRequestRepository
 from src.schemas.order import CheckoutRequest, OrderResponse
 from src.services.order_service import OrderService
 
@@ -17,7 +18,8 @@ def get_order_service(db: AsyncSession = Depends(get_db)) -> OrderService:
         OrderRepository(db),
         CartRepository(db),
         ProductRepository(db),
-        CouponRepository(db)
+        CouponRepository(db),
+        CustomRequestRepository(db)
     )
 
 @router.post("/checkout", response_model=OrderResponse, status_code=201)

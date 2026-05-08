@@ -13,6 +13,7 @@ class OrderItemResponse(BaseModel):
     product_id: int
     quantity: int
     unit_price: Decimal
+    variation: str | None = None
 
 
 class CheckoutRequest(BaseModel):

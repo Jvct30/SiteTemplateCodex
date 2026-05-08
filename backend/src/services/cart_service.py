@@ -18,14 +18,14 @@ class CartService:
             cart = await self.cart_repo.get_by_user_id(user_id) # reload with rels
         return cart  # type: ignore
 
-    async def add_item(self, user_id: int, product_id: int, quantity: int) -> CartItem:
+    async def add_item(self, user_id: int, product_id: int, quantity: int, variation: str | None = None) -> CartItem:
         cart = await self.get_cart(user_id)
         
         product = await self.product_repo.get_by_id(product_id)
         if not product or not product.is_active:
             raise NotFoundException("Produto indisponível")
             
-        existing_item = await self.cart_repo.get_item(cart.id, product_id)
+        existing_item = await self.cart_repo.get_item(cart.id, product_id, variation)
         
         total_qty = existing_item.quantity + quantity if existing_item else quantity
         if product.stock < total_qty:
@@ -35,7 +35,7 @@ class CartService:
             item = await self.cart_repo.update_item_quantity(existing_item.id, total_qty)
             return item  # type: ignore
         else:
-            return await self.cart_repo.add_item(cart.id, product_id, quantity)
+            return await self.cart_repo.add_item(cart.id, product_id, quantity, variation)
 
     async def update_item_quantity(self, user_id: int, item_id: int, quantity: int) -> CartItem:
         cart = await self.get_cart(user_id)

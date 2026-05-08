@@ -34,6 +34,7 @@ class CartItem(Base):
         ForeignKey("products.id"), nullable=False
     )
     quantity: Mapped[int] = mapped_column(default=1, nullable=False)
+    variation: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Relationships
     cart: Mapped["Cart"] = relationship("Cart", back_populates="items")

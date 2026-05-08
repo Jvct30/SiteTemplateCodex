@@ -33,7 +33,8 @@ async def get_cart(
             product_price=item.product.price,
             product_image_url=item.product.image_url,
             quantity=item.quantity,
-            subtotal=subtotal
+            subtotal=subtotal,
+            variation=item.variation
         ))
         
     return CartResponse(id=cart.id, items=items, total=total)
@@ -44,7 +45,7 @@ async def add_item(
     current_user: User = Depends(get_current_user),
     cart_service: CartService = Depends(get_cart_service)
 ):
-    item = await cart_service.add_item(current_user.id, data.product_id, data.quantity)
+    item = await cart_service.add_item(current_user.id, data.product_id, data.quantity, data.variation)
     product = await cart_service.product_repo.get_by_id(data.product_id)
     subtotal = product.price * item.quantity
     return CartItemResponse(
@@ -54,7 +55,8 @@ async def add_item(
         product_price=product.price,
         product_image_url=product.image_url,
         quantity=item.quantity,
-        subtotal=subtotal
+        subtotal=subtotal,
+        variation=item.variation
     )
 
 @router.put("/items/{item_id}", response_model=CartItemResponse)
@@ -74,7 +76,8 @@ async def update_item(
         product_price=product.price,
         product_image_url=product.image_url,
         quantity=item.quantity,
-        subtotal=subtotal
+        subtotal=subtotal,
+        variation=item.variation
     )
 
 @router.delete("/items/{item_id}", status_code=204)

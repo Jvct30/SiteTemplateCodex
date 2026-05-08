@@ -81,7 +81,7 @@ export default function ProfilePage() {
                         <span className="w-6 h-6 bg-lunart-purple-600 rounded flex items-center justify-center text-xs">
                           {item.quantity}x
                         </span>
-                        <span>Produto #{item.product_id}</span>
+                        <span>Produto #{item.product_id} {item.variation && <span className="text-lunart-pink-400">({item.variation})</span>}</span>
                       </div>
                       <span className="text-lunart-white/60">R$ {Number(item.unit_price).toFixed(2)}</span>
                     </div>

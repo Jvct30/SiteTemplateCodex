@@ -58,6 +58,7 @@ class OrderItem(Base):
     )
     quantity: Mapped[int] = mapped_column(nullable=False)
     unit_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    variation: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Relationships
     order: Mapped["Order"] = relationship("Order", back_populates="items")

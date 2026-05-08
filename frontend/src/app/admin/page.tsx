@@ -4,6 +4,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import api from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function AdminPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -14,6 +15,7 @@ export default function AdminPage() {
   const [productStock, setProductStock] = useState("");
   const [productDesc, setProductDesc] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [variations, setVariations] = useState("");
 
   if (isLoading) return null;
   if (!isAuthenticated || user?.role !== "admin") {
@@ -28,16 +30,18 @@ export default function AdminPage() {
         description: productDesc || null,
         price: parseFloat(productPrice),
         stock: parseInt(productStock, 10),
-        image_url: imageUrl || null
+        image_url: imageUrl || null,
+        variations: variations.trim() ? variations.split(",").map(v => v.trim()) : null
       });
-      alert("Produto criado com sucesso!");
+      toast.success("Produto criado com sucesso!");
       setProductName("");
       setProductPrice("");
       setProductStock("");
       setProductDesc("");
       setImageUrl("");
+      setVariations("");
     } catch (err) {
-      alert("Erro ao criar produto.");
+      toast.error("Erro ao criar produto.");
     }
   };
 
@@ -68,6 +72,10 @@ export default function AdminPage() {
             <div>
               <label className="block text-xs mb-1">URL da Imagem (Cloudinary)</label>
               <input type="url" value={imageUrl} onChange={e=>setImageUrl(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" placeholder="https://res.cloudinary.com/..." />
+            </div>
+            <div>
+              <label className="block text-xs mb-1">Variações (Separadas por vírgula)</label>
+              <input type="text" value={variations} onChange={e=>setVariations(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" placeholder="Ex: Rosa, Azul, Pequeno, Grande" />
             </div>
             <div>
               <label className="block text-xs mb-1">Descrição</label>

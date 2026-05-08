@@ -28,6 +28,7 @@ class CartItemResponse(BaseModel):
     product_image_url: str | None
     quantity: int
     subtotal: Decimal
+    variation: str | None = None
 
 
 class CartResponse(BaseModel):

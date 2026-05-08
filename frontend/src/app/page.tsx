@@ -6,6 +6,8 @@ import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
 import { ShoppingCart } from "lucide-react";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { triggerStars } from "@/lib/confetti";
 
 export default function Home() {
   const { products, isLoading } = useProducts();
@@ -16,10 +18,16 @@ export default function Home() {
     e.preventDefault();
     try {
       setAddingId(productId);
-      await addToCart({ productId, quantity: 1 });
-    } catch (err) {
+      
+      // We don't have variation selection on homepage, default to first variation if exists (or none)
+      // Since we don't fetch full product details here easily for variation 0, we can just send undefined
+      // and let the user customize in the cart/product page, or if it requires variation, it will fail gracefully.
+      await addToCart({ productId, quantity: 1, variation: undefined });
+      triggerStars(e);
+      toast.success("Adicionado ao carrinho!");
+    } catch (err: any) {
       console.error(err);
-      alert("Erro ao adicionar ao carrinho ou precisa de login");
+      toast.error(err.response?.data?.detail || "Erro ao adicionar ao carrinho ou precisa de login");
     } finally {
       setAddingId(null);
     }
@@ -33,7 +41,7 @@ export default function Home() {
           src="/Lunart-Header.jpg"
           alt="Lunart Artesanato"
           fill
-          className="object-cover opacity-60 mix-blend-overlay"
+          className="object-contain"
           priority
         />
         <div className="relative z-10 px-4">

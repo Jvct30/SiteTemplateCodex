@@ -39,7 +39,7 @@ export default function CartPage() {
         setDiscountPercent(0);
       }
     } catch (err) {
-      alert("Erro ao validar cupom");
+      toast.error("Erro ao validar cupom");
     }
   };
 
@@ -54,7 +54,7 @@ export default function CartPage() {
         window.location.href = order.payment_link;
       }
     } catch (err: any) {
-      alert(err.response?.data?.detail || "Erro ao finalizar compra");
+      toast.error(err.response?.data?.detail || "Erro ao finalizar compra");
     }
   };
 
@@ -90,7 +90,9 @@ export default function CartPage() {
               <Image src={item.product_image_url || "/Lunart-Header.jpg"} alt={item.product_name} fill className="object-cover" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-lg">{item.product_name}</h3>
+              <h3 className="font-semibold text-lg">
+                {item.product_name} {item.variation && <span className="text-sm font-normal text-lunart-pink-400">({item.variation})</span>}
+              </h3>
               <p className="text-lunart-pink-300 font-bold">R$ {Number(item.product_price).toFixed(2)}</p>
             </div>
             <div className="flex items-center gap-3 bg-lunart-surface-light rounded-lg p-1">

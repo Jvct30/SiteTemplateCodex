@@ -4,7 +4,9 @@ import { useProduct } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useState, use } from "react";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { triggerStars } from "@/lib/confetti";
 import { ShoppingCart, Star } from "lucide-react";
 
 export default function ProductDetails() {
@@ -13,6 +15,13 @@ export default function ProductDetails() {
   const { product, isLoading, error } = useProduct(id);
   const { addToCart } = useCart();
   const [adding, setAdding] = useState(false);
+  const [selectedVariation, setSelectedVariation] = useState<string>("");
+
+  useEffect(() => {
+    if (product?.variations && product.variations.length > 0) {
+      setSelectedVariation(product.variations[0]);
+    }
+  }, [product]);
 
   if (isLoading) {
     return <div className="flex justify-center mt-20"><div className="w-12 h-12 rounded-full border-4 border-lunart-purple-500 border-t-transparent animate-spin"></div></div>;
@@ -22,13 +31,18 @@ export default function ProductDetails() {
     return <div className="text-center mt-20 text-xl">Produto não encontrado.</div>;
   }
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     try {
       setAdding(true);
-      await addToCart({ productId: product.id, quantity: 1 });
-      alert("Adicionado ao carrinho!");
-    } catch (err) {
-      alert("Faça login para adicionar ao carrinho.");
+      await addToCart({ 
+        productId: product.id, 
+        quantity: 1, 
+        variation: selectedVariation || undefined 
+      });
+      triggerStars(e);
+      toast.success("Adicionado ao carrinho!");
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Faça login para adicionar ao carrinho.");
     } finally {
       setAdding(false);
     }
@@ -63,6 +77,27 @@ export default function ProductDetails() {
             {product.description || "Esta é uma peça única, feita com muito amor e poeira estelar."}
           </p>
 
+          {product.variations && product.variations.length > 0 && (
+            <div className="mb-8">
+              <span className="text-sm text-lunart-white/60 block mb-3">Escolha a Variação</span>
+              <div className="flex flex-wrap gap-3">
+                {product.variations.map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setSelectedVariation(v)}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all border ${
+                      selectedVariation === v 
+                        ? "bg-lunart-purple-600 border-lunart-purple-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.5)]" 
+                        : "bg-lunart-surface-light border-lunart-purple-500/20 text-lunart-white/70 hover:border-lunart-purple-400"
+                    }`}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mt-auto">
             <div className="mb-6">
               <span className="text-sm text-lunart-white/60 block mb-1">Preço Final</span>
@@ -82,7 +117,7 @@ export default function ProductDetails() {
               </button>
             </div>
             <p className="text-center text-sm text-lunart-white/40 mt-4">
-              Restam apenas {product.stock} unidades desta constelação.
+              Restam apenas {product.stock} unidades.
             </p>
           </div>
         </div>

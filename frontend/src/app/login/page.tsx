@@ -4,13 +4,17 @@ import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { ptBR } from 'date-fns/locale/pt-BR';
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
   
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
   
   // Login State
   const [username, setUsername] = useState("");
@@ -19,7 +23,7 @@ export default function LoginPage() {
   // Register State
   const [fullName, setFullName] = useState("");
   const [cpf, setCpf] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
   const [complement, setComplement] = useState("");
@@ -30,26 +34,25 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     try {
       const res = await api.post("/auth/login", { username, password });
       await login(res.data.access_token);
+      toast.success("Login realizado com sucesso!");
       router.push("/");
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Erro ao realizar login");
+      toast.error(err.response?.data?.detail || "Erro ao realizar login");
     }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     try {
       await api.post("/auth/register", {
         full_name: fullName,
         username,
         password,
         cpf,
-        birth_date: birthDate,
+        birth_date: birthDate ? birthDate.toISOString().split("T")[0] : "",
         address_street: street,
         address_number: number,
         address_complement: complement || null,
@@ -61,9 +64,10 @@ export default function LoginPage() {
       // After register, login
       const res = await api.post("/auth/login", { username, password });
       await login(res.data.access_token);
+      toast.success("Cadastro realizado com sucesso!");
       router.push("/");
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Erro ao realizar cadastro");
+      toast.error(err.response?.data?.detail || "Erro ao realizar cadastro");
     }
   };
 
@@ -72,12 +76,6 @@ export default function LoginPage() {
       <h1 className="text-3xl font-display font-bold text-center mb-6 text-transparent bg-clip-text bg-lunart-gradient">
         {isLogin ? "Bem-vindo de volta" : "Criar Conta Estelar"}
       </h1>
-
-      {error && (
-        <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-lg mb-4 text-sm text-center">
-          {error}
-        </div>
-      )}
 
       {isLogin ? (
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -128,7 +126,16 @@ export default function LoginPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Data Nascimento</label>
-              <input type="date" required value={birthDate} onChange={e => setBirthDate(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-2" />
+              <DatePicker 
+                selected={birthDate} 
+                onChange={(date) => setBirthDate(date)} 
+                locale={ptBR}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="dd/mm/aaaa"
+                className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-2 focus:outline-none focus:border-lunart-pink-400"
+                wrapperClassName="w-full"
+                required
+              />
             </div>
           </div>
           

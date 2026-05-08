@@ -27,9 +27,11 @@ class CartRepository(ICartRepository):
         await self.session.flush()
         return cart
 
-    async def get_item(self, cart_id: int, product_id: int) -> CartItem | None:
+    async def get_item(self, cart_id: int, product_id: int, variation: str | None = None) -> CartItem | None:
         stmt = select(CartItem).where(
-            CartItem.cart_id == cart_id, CartItem.product_id == product_id
+            CartItem.cart_id == cart_id, 
+            CartItem.product_id == product_id,
+            CartItem.variation == variation
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
@@ -37,8 +39,8 @@ class CartRepository(ICartRepository):
     async def get_item_by_id(self, item_id: int) -> CartItem | None:
         return await self.session.get(CartItem, item_id)
 
-    async def add_item(self, cart_id: int, product_id: int, quantity: int) -> CartItem:
-        item = CartItem(cart_id=cart_id, product_id=product_id, quantity=quantity)
+    async def add_item(self, cart_id: int, product_id: int, quantity: int, variation: str | None = None) -> CartItem:
+        item = CartItem(cart_id=cart_id, product_id=product_id, quantity=quantity, variation=variation)
         self.session.add(item)
         await self.session.flush()
         return item

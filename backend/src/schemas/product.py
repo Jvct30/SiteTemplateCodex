@@ -12,6 +12,7 @@ class ProductCreate(BaseModel):
     price: Decimal = Field(gt=0)
     stock: int = Field(ge=0)
     image_url: str | None = None
+    variations: list[str] | None = None
 
 
 class ProductUpdate(BaseModel):
@@ -23,6 +24,7 @@ class ProductUpdate(BaseModel):
     stock: int | None = Field(default=None, ge=0)
     image_url: str | None = None
     is_active: bool | None = None
+    variations: list[str] | None = None
 
 
 class ProductResponse(BaseModel):
@@ -38,3 +40,4 @@ class ProductResponse(BaseModel):
     image_url: str | None
     is_active: bool
     created_at: datetime
+    variations: list[str] | None = None

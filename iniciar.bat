@@ -6,7 +6,7 @@ echo =========================================
 echo.
 
 echo [1] Iniciando Backend (FastAPI)...
-start "Lunart Backend" cmd /k "cd backend && poetry run python run.py"
+start "Lunart Backend" cmd /k "cd backend && .venv\Scripts\python run.py"
 
 echo [2] Iniciando Frontend (Next.js)...
 start "Lunart Frontend" cmd /k "cd frontend && npm run dev"

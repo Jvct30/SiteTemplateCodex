@@ -1,0 +1,67 @@
+# =========================
+# Operating System Files
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# =========================
+# IDEs and Editors
+# =========================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# =========================
+# Backend (Python / FastAPI)
+# =========================
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/.venv/
+backend/venv/
+backend/env/
+backend/lunart.db
+backend/.env
+backend/alembic.ini
+backend/*.egg-info/
+backend/dist/
+backend/build/
+
+# =========================
+# Frontend (Next.js)
+# =========================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnp.*
+frontend/.eslintcache
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# =========================
+# General / Global
+# =========================
+*.log
+.env
+secrets/
+coverage/
+*.bak

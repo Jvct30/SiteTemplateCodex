@@ -5,10 +5,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
+import { useProducts } from "@/hooks/useProducts";
+import { useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 
 export default function AdminPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const { products } = useProducts();
+  const queryClient = useQueryClient();
   
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("");
@@ -56,6 +61,17 @@ export default function AdminPage() {
       toast.success("Aviso removido!");
     } catch (err) {
       toast.error("Erro ao remover aviso.");
+    }
+  };
+
+  const handleDeleteProduct = async (id: number) => {
+    if (!confirm("Tem certeza que deseja deletar este produto?")) return;
+    try {
+      await api.delete(`/admin/products/${id}`);
+      toast.success("Produto removido com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch (err) {
+      toast.error("Erro ao remover produto.");
     }
   };
 
@@ -142,6 +158,26 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
+
+          {/* Product List */}
+          <div className="glass p-6 rounded-3xl max-h-[400px] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4">Gerenciar Produtos</h2>
+            <div className="flex flex-col gap-2">
+              {products?.map(p => (
+                <div key={p.id} className="flex justify-between items-center bg-lunart-surface-light p-3 rounded-lg border border-lunart-white/5">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold">{p.name}</span>
+                    <span className="text-xs text-lunart-pink-400">R$ {Number(p.price).toFixed(2)} | Estoque: {p.stock}</span>
+                  </div>
+                  <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {!products?.length && <p className="text-sm text-lunart-white/60">Nenhum produto cadastrado.</p>}
+            </div>
+          </div>
+
 
           <div className="glass p-6 rounded-3xl">
             <h2 className="text-xl font-bold mb-4">Avisos Sistema</h2>

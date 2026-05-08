@@ -38,9 +38,6 @@ logger = logging.getLogger("lunart")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure uploads directory exists
-    os.makedirs("uploads", exist_ok=True)
-    
     # Auto-create tables for simplicity (Notices, etc)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -67,6 +64,7 @@ app.add_middleware(
 )
 
 # Static Files for Image Uploads
+os.makedirs("uploads", exist_ok=True)
 app.mount("/static", StaticFiles(directory="uploads"), name="static")
 
 # Global Exception Handlers

@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-lunart-bg text-lunart-white min-h-screen font-sans;
+    background: linear-gradient(180deg, #0f0a1a, #1a1230, #241a40);
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-lunart-surface/60 backdrop-blur-md border border-lunart-purple-300/15;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-lunart-bg;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-lunart-purple-600 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-lunart-purple-500;
+  }
+}

@@ -90,6 +90,14 @@ export interface CustomRequestMessageResponse {
   created_at: string;
 }
 
+export interface CustomRequestResponse {
+  id: number;
+  user_id: number;
+  subject: string;
+  status: string;
+  created_at: string;
+}
+
 export interface CustomRequestDetailResponse {
   id: number;
   user_id: number;

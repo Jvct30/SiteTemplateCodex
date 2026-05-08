@@ -4,6 +4,10 @@ import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
 import { AuthProvider } from "@/providers/auth-provider";
 
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { StarField } from "@/components/layout/StarField";
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
@@ -24,11 +28,12 @@ export default function RootLayout({
       >
         <QueryProvider>
           <AuthProvider>
-            {/* Header placeholder will go here */}
-            <main className="relative z-10 flex min-h-screen flex-col">
+            <StarField />
+            <Header />
+            <main className="relative z-10 flex flex-col flex-1 container mx-auto px-4 py-8">
               {children}
             </main>
-            {/* Footer placeholder will go here */}
+            <Footer />
           </AuthProvider>
         </QueryProvider>
       </body>

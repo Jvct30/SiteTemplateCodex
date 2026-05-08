@@ -66,7 +66,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex gap-4 items-center">
                     <span className="text-xl font-bold text-transparent bg-clip-text bg-hero-gradient">
-                      R$ {order.total.toFixed(2)}
+                      R$ {Number(order.total).toFixed(2)}
                     </span>
                     <span className="bg-lunart-surface-light px-3 py-1 rounded-full text-xs font-bold uppercase">
                       {order.status}
@@ -83,7 +83,7 @@ export default function ProfilePage() {
                         </span>
                         <span>Produto #{item.product_id}</span>
                       </div>
-                      <span className="text-lunart-white/60">R$ {item.unit_price.toFixed(2)}</span>
+                      <span className="text-lunart-white/60">R$ {Number(item.unit_price).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>

@@ -73,7 +73,7 @@ export default function ProductDetails() {
             <div className="mb-6">
               <span className="text-sm text-lunart-white/60 block mb-1">Preço Final</span>
               <span className="text-5xl font-bold text-transparent bg-clip-text bg-hero-gradient">
-                R$ {product.price.toFixed(2)}
+                R$ {Number(product.price).toFixed(2)}
               </span>
             </div>
 

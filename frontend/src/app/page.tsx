@@ -83,7 +83,7 @@ export default function Home() {
                   <h3 className="text-lg font-semibold truncate mb-1">{product.name}</h3>
                   <div className="flex items-center justify-between mt-4">
                     <span className="text-xl font-bold text-lunart-pink-300">
-                      R$ {product.price.toFixed(2)}
+                      R$ {Number(product.price).toFixed(2)}
                     </span>
                     <button 
                       onClick={(e) => handleAddToCart(e, product.id)}

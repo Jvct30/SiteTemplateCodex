@@ -80,6 +80,7 @@ export default function LoginPage() {
   const isLogin = searchParams.get("mode") !== "register";
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [registerErrors, setRegisterErrors] = useState<Partial<Record<RegisterField, string>>>({});
   
@@ -201,7 +202,7 @@ export default function LoginPage() {
   return (
     <div className="mx-auto mt-6 w-full max-w-2xl rounded-lg glass p-6 animate-slide-up sm:p-8">
       <h1 className="mb-2 text-center font-display text-3xl font-bold text-transparent bg-clip-text bg-lunart-gradient">
-        {isLogin ? "Bem-vindo de volta" : "Criar Conta Estelar"}
+        {isLogin ? "Bem-vindo de volta" : "Criar conta"}
       </h1>
       <p className="mb-8 text-center text-sm text-lunart-white/55">
         {isLogin
@@ -223,13 +224,23 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1 text-lunart-white/80">Senha</label>
-            <input 
-              type="password" 
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="form-field"
-            />
+            <div className="relative">
+              <input
+                type={showLoginPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="form-field pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowLoginPassword((value) => !value)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-2 text-lunart-white/60 transition-colors hover:bg-lunart-white/10 hover:text-lunart-white"
+                aria-label={showLoginPassword ? "Ocultar senha" : "Mostrar senha"}
+              >
+                {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
@@ -291,6 +302,7 @@ export default function LoginPage() {
               <input
                 type="text"
                 inputMode="numeric"
+                maxLength={14}
                 required
                 value={cpf}
                 onChange={e => { setCpf(formatCpf(e.target.value)); clearRegisterError("cpf"); }}
@@ -305,6 +317,7 @@ export default function LoginPage() {
             <input
               type="text"
               inputMode="numeric"
+              maxLength={10}
               required
               value={birthDate}
               onChange={(e) => { setBirthDate(formatBirthDate(e.target.value)); clearRegisterError("birthDate"); }}

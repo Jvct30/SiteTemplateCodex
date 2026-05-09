@@ -47,9 +47,13 @@ async def ensure_sqlite_columns(conn) -> None:
         },
         "custom_requests": {
             "quoted_product_id": "INTEGER",
+            "request_type": "VARCHAR(30) NOT NULL DEFAULT 'custom_order'",
         },
         "orders": {
             "support_request_id": "INTEGER",
+        },
+        "order_items": {
+            "variation": "VARCHAR(100)",
         },
     }
 
@@ -61,6 +65,30 @@ async def ensure_sqlite_columns(conn) -> None:
                 await conn.execute(
                     text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_sql}")
                 )
+
+    await conn.execute(
+        text(
+            """
+            UPDATE custom_requests
+            SET request_type = 'order_support'
+            WHERE subject LIKE 'Acompanhamento do Pedido #%'
+            """
+        )
+    )
+    await conn.execute(
+        text(
+            """
+            UPDATE orders
+            SET support_request_id = (
+                SELECT cr.id
+                FROM custom_requests cr
+                WHERE cr.subject = 'Acompanhamento do Pedido #' || orders.id
+                LIMIT 1
+            )
+            WHERE support_request_id IS NULL
+            """
+        )
+    )
 
 
 @asynccontextmanager

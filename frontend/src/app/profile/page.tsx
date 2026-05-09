@@ -7,6 +7,7 @@ import { Package } from "lucide-react";
 import { useEffect } from "react";
 import { formatMoney } from "@/lib/formatters";
 import Link from "next/link";
+import { formatDate, formatDateTime } from "@/lib/dates";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -44,7 +45,7 @@ export default function ProfilePage() {
           </div>
           <div>
             <span className="block text-lunart-white/40">Membro desde</span>
-            <p>{new Date(user.created_at).toLocaleDateString('pt-BR')}</p>
+            <p>{formatDate(user.created_at)}</p>
           </div>
         </div>
       </div>
@@ -73,7 +74,7 @@ export default function ProfilePage() {
                 <div className="flex flex-wrap justify-between items-center mb-4 pb-4 border-b border-lunart-white/10">
                   <div>
                     <div className="font-bold">Pedido #{order.id}</div>
-                    <div className="text-xs text-lunart-white/40">{new Date(order.created_at).toLocaleString('pt-BR')}</div>
+                    <div className="text-xs text-lunart-white/40">{formatDateTime(order.created_at)}</div>
                   </div>
                   <div className="flex gap-4 items-center">
                     <span className="text-xl font-bold text-transparent bg-clip-text bg-hero-gradient">

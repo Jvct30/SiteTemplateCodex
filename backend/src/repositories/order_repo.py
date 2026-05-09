@@ -39,13 +39,19 @@ class OrderRepository(IOrderRepository):
         return order
 
     async def add_item(
-        self, order_id: int, product_id: int, quantity: int, unit_price: Decimal
+        self,
+        order_id: int,
+        product_id: int,
+        quantity: int,
+        unit_price: Decimal,
+        variation: str | None = None,
     ) -> OrderItem:
         item = OrderItem(
             order_id=order_id,
             product_id=product_id,
             quantity=quantity,
             unit_price=unit_price,
+            variation=variation,
         )
         self.session.add(item)
         await self.session.flush()

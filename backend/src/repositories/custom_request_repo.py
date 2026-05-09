@@ -12,8 +12,15 @@ class CustomRequestRepository(ICustomRequestRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def create(self, user_id: int, subject: str) -> CustomRequest:
-        req = CustomRequest(user_id=user_id, subject=subject, status="open")
+    async def create(
+        self, user_id: int, subject: str, request_type: str = "custom_order"
+    ) -> CustomRequest:
+        req = CustomRequest(
+            user_id=user_id,
+            subject=subject,
+            request_type=request_type,
+            status="open",
+        )
         self.session.add(req)
         await self.session.flush()
         return req
@@ -31,13 +38,18 @@ class CustomRequestRepository(ICustomRequestRepository):
         stmt = (
             select(CustomRequest)
             .where(CustomRequest.user_id == user_id)
+            .where(CustomRequest.request_type == "custom_order")
             .order_by(CustomRequest.created_at.desc())
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
     async def list_all(self) -> list[CustomRequest]:
-        stmt = select(CustomRequest).order_by(CustomRequest.created_at.desc())
+        stmt = (
+            select(CustomRequest)
+            .where(CustomRequest.request_type == "custom_order")
+            .order_by(CustomRequest.created_at.desc())
+        )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 

@@ -22,7 +22,12 @@ class IOrderRepository(ABC):
 
     @abstractmethod
     async def add_item(
-        self, order_id: int, product_id: int, quantity: int, unit_price: Decimal
+        self,
+        order_id: int,
+        product_id: int,
+        quantity: int,
+        unit_price: Decimal,
+        variation: str | None = None,
     ) -> OrderItem:
         pass
 

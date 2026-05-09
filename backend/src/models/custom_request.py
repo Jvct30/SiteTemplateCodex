@@ -20,6 +20,9 @@ class CustomRequest(Base):
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     subject: Mapped[str] = mapped_column(String(255), nullable=False)
+    request_type: Mapped[str] = mapped_column(
+        String(30), default="custom_order", nullable=False
+    )
     status: Mapped[str] = mapped_column(
         String(20), default="open", nullable=False
     )

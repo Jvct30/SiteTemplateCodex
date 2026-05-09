@@ -103,6 +103,7 @@ export interface CustomRequestResponse {
   id: number;
   user_id: number;
   subject: string;
+  request_type: string;
   status: string;
   quoted_product_id?: number | null;
   created_at: string;
@@ -112,6 +113,7 @@ export interface CustomRequestDetailResponse {
   id: number;
   user_id: number;
   subject: string;
+  request_type: string;
   status: string;
   quoted_product_id?: number | null;
   created_at: string;

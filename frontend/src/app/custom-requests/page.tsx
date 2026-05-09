@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Plus, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
+import { formatDateTime } from "@/lib/dates";
 
 export default function CustomRequestsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -98,7 +99,7 @@ export default function CustomRequestsPage() {
             >
               <div>
                 <h3 className="font-bold text-lg">{req.subject}</h3>
-                <span className="text-xs text-lunart-white/40">{new Date(req.created_at).toLocaleString('pt-BR')}</span>
+                <span className="text-xs text-lunart-white/40">{formatDateTime(req.created_at)}</span>
               </div>
               <div className="flex items-center gap-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${

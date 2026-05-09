@@ -44,6 +44,7 @@ class CustomRequestResponse(BaseModel):
     id: int
     user_id: int
     subject: str
+    request_type: str = "custom_order"
     status: str
     quoted_product_id: int | None = None
     created_at: datetime
@@ -57,6 +58,7 @@ class CustomRequestDetailResponse(BaseModel):
     id: int
     user_id: int
     subject: str
+    request_type: str = "custom_order"
     status: str
     quoted_product_id: int | None = None
     created_at: datetime

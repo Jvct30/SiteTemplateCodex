@@ -40,8 +40,13 @@ class CustomRequestService:
     async def list_all_requests(self) -> list[CustomRequest]:
         return await self.request_repo.list_all()
 
-    async def create_request(self, user_id: int, data: CustomRequestCreate) -> CustomRequest:
-        req = await self.request_repo.create(user_id, data.subject)
+    async def create_request(
+        self,
+        user_id: int,
+        data: CustomRequestCreate,
+        request_type: str = "custom_order",
+    ) -> CustomRequest:
+        req = await self.request_repo.create(user_id, data.subject, request_type)
         # Automatically add the first message from the user
         await self.request_repo.add_message(req.id, sender_role="customer", content=data.message)
         # Reload to include the message
@@ -90,6 +95,8 @@ class CustomRequestService:
             raise BadRequestException("Serviço de produtos indisponível")
 
         req = await self.get_request(request_id, is_admin=True)
+        if req.request_type != "custom_order":
+            raise BadRequestException("Este chat não é um pedido sob encomenda")
         if req.status in {"closed", "cancelled"}:
             raise BadRequestException("Não é possível criar pedido para chat fechado")
 

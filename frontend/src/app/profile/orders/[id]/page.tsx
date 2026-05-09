@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { formatDateTime } from "@/lib/dates";
 
 const statusLabels: Record<string, string> = {
   pending: "Aguardando pagamento",
@@ -62,7 +63,7 @@ export default function OrderDetailsPage() {
             </div>
             <h1 className="font-display text-3xl font-bold">Pedido #{order.id}</h1>
             <p className="mt-2 text-sm text-lunart-white/55">
-              Criado em {new Date(order.created_at).toLocaleString("pt-BR")}
+              Criado em {formatDateTime(order.created_at)}
             </p>
           </div>
           <span className="w-fit rounded-full bg-lunart-white/10 px-4 py-2 text-xs font-bold uppercase text-lunart-pink-300">

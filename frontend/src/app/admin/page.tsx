@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Megaphone, MessageSquare, PackagePlus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { formatMoney } from "@/lib/formatters";
+import { formatDateTime } from "@/lib/dates";
 
 export default function AdminPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -231,7 +232,7 @@ export default function AdminPage() {
                     <div>
                       <h3 className="font-semibold">{request.subject}</h3>
                       <p className="text-xs text-lunart-white/45">
-                        Cliente #{request.user_id} • {new Date(request.created_at).toLocaleString("pt-BR")}
+                        Cliente #{request.user_id} • {formatDateTime(request.created_at)}
                       </p>
                     </div>
                     <span className="w-fit rounded-full bg-lunart-white/10 px-3 py-1 text-xs font-bold uppercase text-lunart-pink-300">

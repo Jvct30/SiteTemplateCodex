@@ -56,11 +56,51 @@ class OrderService:
         valid_statuses = ["pending", "paid", "shipped", "delivered", "cancelled"]
         if status not in valid_statuses:
             raise BadRequestException("Status inválido")
-            
+
+        current_order = await self.get_order(order_id, is_admin=True)
+        should_confirm_payment = (
+            status == "paid"
+            and current_order.status not in {"paid", "shipped", "delivered"}
+        )
+
+        if should_confirm_payment:
+            await self._confirm_payment(current_order)
+
         order = await self.order_repo.update_status(order_id, status)
         if not order:
             raise NotFoundException("Pedido não encontrado")
         return order
+
+    async def _confirm_payment(self, order: Order) -> None:
+        """Apply effects that must happen only after payment is confirmed."""
+        custom_request_ids: set[int] = set()
+
+        for item in order.items:
+            product = await self.product_repo.get_by_id(item.product_id)
+            if not product or not product.is_active:
+                raise ConflictException(f"Produto indisponível: Produto #{item.product_id}")
+
+            success = await self.product_repo.decrement_stock(product.id, item.quantity)
+            if not success:
+                raise ConflictException(f"Estoque insuficiente para: {product.name}")
+
+            if product.custom_request_id:
+                custom_request_ids.add(product.custom_request_id)
+
+        for request_id in custom_request_ids:
+            await self.custom_request_service.update_status(request_id, "closed")
+            await self.custom_request_service.request_repo.add_message(
+                request_id,
+                "system",
+                f"Pagamento confirmado no pedido #{order.id}. Este chat foi fechado.",
+            )
+
+        if order.support_request_id:
+            await self.custom_request_service.request_repo.add_message(
+                order.support_request_id,
+                "system",
+                f"Pagamento confirmado no pedido #{order.id}. A preparação do pedido pode começar.",
+            )
 
     async def checkout(self, user_id: int, data: CheckoutRequest) -> Order:
         """
@@ -70,30 +110,28 @@ class OrderService:
         if not cart or not cart.items:
             raise BadRequestException("O carrinho está vazio")
 
-        # 1. Check stock and reserve items using decrement_stock
+        # 1. Check stock without decrementing. Stock leaves the store only after payment.
         subtotal = Decimal("0.00")
         items_to_buy = []
-        custom_request_ids: set[int] = set()
         for item in cart.items:
             product = await self.product_repo.get_by_id(item.product_id)
             if not product or not product.is_active:
                 raise ConflictException(f"Produto indisponível: {item.product.name}")
             if product.is_private and product.owner_user_id != user_id:
                 raise ConflictException(f"Produto indisponível: {product.name}")
-                
-            success = await self.product_repo.decrement_stock(product.id, item.quantity)
-            if not success:
+
+            if product.stock < item.quantity:
                 raise ConflictException(f"Estoque insuficiente para: {product.name}")
                 
             item_subtotal = product.price * item.quantity
             subtotal += item_subtotal
             items_to_buy.append({
                 "product_id": product.id,
+                "product_name": product.name,
                 "quantity": item.quantity,
-                "unit_price": product.price
+                "unit_price": product.price,
+                "variation": item.variation,
             })
-            if product.custom_request_id:
-                custom_request_ids.add(product.custom_request_id)
 
         # 2. Calculate Shipping
         shipping_cost = self.shipping_service.get_cost_sync(data.shipping_method)
@@ -130,24 +168,16 @@ class OrderService:
                 product_id=item_data["product_id"],
                 quantity=item_data["quantity"],
                 unit_price=item_data["unit_price"],
+                variation=item_data["variation"],
             )
 
         # 7. Clear Cart
         await self.cart_repo.clear(cart.id)
-        
-        # 8. Close quoted custom chats purchased in this checkout
-        for request_id in custom_request_ids:
-            await self.custom_request_service.update_status(request_id, "closed")
-            await self.custom_request_service.request_repo.add_message(
-                request_id,
-                "system",
-                f"Pagamento registrado no pedido #{order.id}. Este chat foi fechado.",
-            )
 
-        # 9. Open post-sale support chat for every sale
+        # 8. Open order support chat without showing it in the custom-order list
         user = cart.user
         item_lines = [
-            f"- Produto #{item['product_id']}: {item['quantity']} unidade(s)"
+            f"- {item['product_name']}: {item['quantity']} unidade(s)"
             for item in items_to_buy
         ]
         address = (
@@ -168,11 +198,13 @@ class OrderService:
             "Confirme por aqui se essas informações estão corretas."
         )
         create_schema = CustomRequestCreate(subject=subject, message=msg)
-        followup = await self.custom_request_service.create_request(user_id, create_schema)
+        followup = await self.custom_request_service.create_request(
+            user_id, create_schema, request_type="order_support"
+        )
         await self.custom_request_service.update_status(followup.id, "answered")
         await self.order_repo.set_support_request(order.id, followup.id)
 
-        # 10. Mock Payment Link
+        # 9. Mock Payment Link
         order.payment_link = f"https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=mock_{order.id}"
 
         # Reload fully populated

@@ -7,7 +7,9 @@ class ICustomRequestRepository(ABC):
     """Abstract interface for CustomRequest data access."""
 
     @abstractmethod
-    async def create(self, user_id: int, subject: str) -> CustomRequest:
+    async def create(
+        self, user_id: int, subject: str, request_type: str = "custom_order"
+    ) -> CustomRequest:
         pass
 
     @abstractmethod

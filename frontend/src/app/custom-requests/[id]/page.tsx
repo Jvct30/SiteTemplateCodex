@@ -8,6 +8,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { useAuth } from "@/providers/auth-provider";
 import { getApiErrorMessage } from "@/lib/api";
+import { formatDateTime } from "@/lib/dates";
 
 export default function CustomRequestChat() {
   const params = useParams();
@@ -179,7 +180,7 @@ export default function CustomRequestChat() {
                   : "bg-lunart-surface-light border border-lunart-purple-500/30 rounded-tl-sm"
               }`}>
                 <div className="text-xs text-lunart-white/40 mb-1">
-                  {isSystem ? "Sistema" : isCustomer ? "Cliente" : "Lunart Admin"} • {new Date(msg.created_at).toLocaleString('pt-BR')}
+                  {isSystem ? "Sistema" : isCustomer ? "Cliente" : "Lunart Admin"} • {formatDateTime(msg.created_at)}
                 </div>
                 <div className="whitespace-pre-wrap">{msg.content}</div>
               </div>

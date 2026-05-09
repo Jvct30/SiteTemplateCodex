@@ -4,10 +4,8 @@ import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import api, { getApiErrorMessage, getApiValidationErrors } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { ptBR } from "date-fns/locale/pt-BR";
 import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 type RegisterField =
   | "fullName"
@@ -50,12 +48,52 @@ const registerFieldLabels: Record<RegisterField, string> = {
   zip: "CEP",
 };
 
+const onlyDigits = (value: string) => value.replace(/\D/g, "");
+
+const formatCpf = (value: string) => {
+  const digits = onlyDigits(value).slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+  if (digits.length <= 9) {
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+  }
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+};
+
+const formatBirthDate = (value: string) => {
+  const digits = onlyDigits(value).slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+};
+
+const parseBirthDate = (value: string) => {
+  const digits = onlyDigits(value);
+  if (digits.length !== 8) return null;
+
+  const day = Number(digits.slice(0, 2));
+  const month = Number(digits.slice(2, 4));
+  const year = Number(digits.slice(4, 8));
+  const date = new Date(year, month - 1, day);
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return `${digits.slice(4, 8)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
+};
+
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
   
   const [isLogin, setIsLogin] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [registerErrors, setRegisterErrors] = useState<Partial<Record<RegisterField, string>>>({});
   
   // Login State
@@ -65,7 +103,7 @@ export default function LoginPage() {
   // Register State
   const [fullName, setFullName] = useState("");
   const [cpf, setCpf] = useState("");
-  const [birthDate, setBirthDate] = useState<Date | null>(null);
+  const [birthDate, setBirthDate] = useState("");
   const [street, setStreet] = useState("");
   const [number, setNumber] = useState("");
   const [complement, setComplement] = useState("");
@@ -135,6 +173,18 @@ export default function LoginPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsedBirthDate = parseBirthDate(birthDate);
+    const cpfDigits = onlyDigits(cpf);
+
+    if (!parsedBirthDate || cpfDigits.length !== 11) {
+      setRegisterErrors({
+        ...(cpfDigits.length !== 11 ? { cpf: "Digite os 11 números do CPF" } : {}),
+        ...(!parsedBirthDate ? { birthDate: "Digite a data completa no formato dd/mm/aaaa" } : {}),
+      });
+      toast.error("Revise os campos destacados.");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setRegisterErrors({});
@@ -142,8 +192,8 @@ export default function LoginPage() {
         full_name: fullName.trim(),
         username: username.trim(),
         password,
-        cpf: cpf.trim(),
-        birth_date: birthDate ? birthDate.toISOString().split("T")[0] : "",
+        cpf: cpfDigits,
+        birth_date: parsedBirthDate,
         address_street: street.trim(),
         address_number: number.trim(),
         address_complement: complement || null,
@@ -226,27 +276,50 @@ export default function LoginPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Senha</label>
-              <input type="password" required value={password} onChange={e => { setPassword(e.target.value); clearRegisterError("password"); }} className={registerInputClass("password")} />
+              <div className="relative">
+                <input
+                  type={showRegisterPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={e => { setPassword(e.target.value); clearRegisterError("password"); }}
+                  className={`${registerInputClass("password")} pr-12`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterPassword((value) => !value)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-2 text-lunart-white/60 transition-colors hover:bg-lunart-white/10 hover:text-lunart-white"
+                  aria-label={showRegisterPassword ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {showRegisterPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {renderFieldError("password")}
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium mb-1">CPF</label>
-              <input type="text" required value={cpf} onChange={e => { setCpf(e.target.value); clearRegisterError("cpf"); }} placeholder="000.000.000-00" className={registerInputClass("cpf")} />
+              <input
+                type="text"
+                inputMode="numeric"
+                required
+                value={cpf}
+                onChange={e => { setCpf(formatCpf(e.target.value)); clearRegisterError("cpf"); }}
+                placeholder="000.000.000-00"
+                className={registerInputClass("cpf")}
+              />
               {renderFieldError("cpf")}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Data Nascimento</label>
-              <DatePicker 
-                selected={birthDate} 
-                onChange={(date: Date | null) => { setBirthDate(date); clearRegisterError("birthDate"); }} 
-                locale={ptBR}
-                dateFormat="dd/MM/yyyy"
-                placeholderText="dd/mm/aaaa"
-                className={registerInputClass("birthDate")}
-                wrapperClassName="w-full"
+              <input
+                type="text"
+                inputMode="numeric"
                 required
+                value={birthDate}
+                onChange={(e) => { setBirthDate(formatBirthDate(e.target.value)); clearRegisterError("birthDate"); }}
+                placeholder="dd/mm/aaaa"
+                className={registerInputClass("birthDate")}
               />
               {renderFieldError("birthDate")}
             </div>

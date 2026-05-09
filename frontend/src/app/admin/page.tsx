@@ -134,7 +134,7 @@ export default function AdminPage() {
               <label className="block text-xs mb-1">Upload de Imagem</label>
               <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="form-field file:mr-4 file:rounded-full file:border-0 file:bg-lunart-purple-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-lunart-purple-500" />
               {uploading && <span className="text-xs text-lunart-pink-400 mt-1 block">Enviando...</span>}
-              {imageUrl && <span className="text-xs text-green-400 mt-1 block">Imagem pronta! ({imageUrl})</span>}
+              {imageUrl && <span className="text-xs text-green-400 mt-1 block">Imagem enviada com sucesso!</span>}
             </div>
             <div>
               <label className="block text-xs mb-1">Variações (Separadas por vírgula)</label>
@@ -183,13 +183,6 @@ export default function AdminPage() {
             </div>
           </div>
 
-
-          <div className="glass rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-4">Avisos Sistema</h2>
-            <p className="text-sm text-lunart-white/60 mb-2">
-              Para funcionalidades completas de gestão (Pedidos, Cupons, Chats), expanda os endpoints consumindo-os aqui.
-            </p>
-          </div>
         </div>
 
       </div>

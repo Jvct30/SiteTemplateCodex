@@ -1,11 +1,11 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-import os
 
 from src.core.config import settings
 from src.core.exceptions import (
@@ -17,7 +17,6 @@ from src.core.exceptions import (
 )
 from src.models.base import Base
 from src.models.db import engine
-from src.models.notice import Notice
 from src.routers import (
     admin_router,
     auth_router,

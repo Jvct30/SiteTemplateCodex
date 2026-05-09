@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.dependencies import get_current_user, get_db
 from src.models.user import User
-from src.repositories.user_repo import UserRepository
 from src.repositories.cart_repo import CartRepository
+from src.repositories.user_repo import UserRepository
 from src.schemas.user import UserResponse, UserUpdate
 from src.services.user_service import UserService
 

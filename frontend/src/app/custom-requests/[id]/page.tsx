@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Send } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function CustomRequestChat() {
   const params = useParams();
@@ -26,8 +27,8 @@ export default function CustomRequestChat() {
     try {
       await sendMessage(content);
       setContent("");
-    } catch (err) {
-      alert("Erro ao enviar mensagem.");
+    } catch {
+      toast.error("Erro ao enviar mensagem.");
     }
   };
 
@@ -37,7 +38,7 @@ export default function CustomRequestChat() {
         ← Voltar
       </Link>
       
-      <div className="glass p-4 rounded-t-3xl border-b-0">
+      <div className="glass rounded-t-lg border-b-0 p-4">
         <h1 className="text-xl font-bold">{request.subject}</h1>
         <div className="text-xs text-lunart-white/40">Status: {request.status}</div>
       </div>
@@ -48,10 +49,10 @@ export default function CustomRequestChat() {
           const isCustomer = msg.sender_role === "customer";
           return (
             <div key={msg.id} className={`flex ${isCustomer ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] p-4 rounded-2xl ${
+              <div className={`max-w-[80%] rounded-lg p-4 ${
                 isCustomer 
-                  ? "bg-lunart-purple-600 rounded-tr-none" 
-                  : "bg-lunart-surface-light border border-lunart-purple-500/30 rounded-tl-none"
+                  ? "bg-lunart-purple-600 rounded-tr-sm" 
+                  : "bg-lunart-surface-light border border-lunart-purple-500/30 rounded-tl-sm"
               }`}>
                 <div className="text-xs text-lunart-white/40 mb-1">
                   {isCustomer ? "Você" : "Lunart Admin"} • {new Date(msg.created_at).toLocaleString('pt-BR')}
@@ -65,19 +66,20 @@ export default function CustomRequestChat() {
       </div>
 
       {/* Input Area */}
-      <div className="glass p-4 rounded-b-3xl">
+      <div className="glass rounded-b-lg p-4">
         <form onSubmit={handleSend} className="flex gap-2">
           <input 
             type="text"
             value={content}
             onChange={e => setContent(e.target.value)}
             placeholder="Digite sua mensagem..."
-            className="flex-1 bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-3 focus:outline-none focus:border-lunart-pink-400"
+            className="form-field flex-1"
           />
           <button 
             type="submit"
             disabled={!content.trim()}
-            className="bg-lunart-pink-500 hover:bg-lunart-pink-400 w-12 h-12 rounded-xl flex items-center justify-center transition-colors disabled:opacity-50"
+            className="flex h-12 w-12 items-center justify-center rounded-lg bg-lunart-pink-500 transition-colors hover:bg-lunart-pink-400 disabled:opacity-50"
+            aria-label="Enviar mensagem"
           >
             <Send className="w-5 h-5" />
           </button>

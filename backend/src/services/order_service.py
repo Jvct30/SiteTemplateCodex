@@ -1,17 +1,21 @@
 from decimal import Decimal
 
-from src.core.exceptions import BadRequestException, ConflictException, NotFoundException
+from src.core.exceptions import (
+    BadRequestException,
+    ConflictException,
+    NotFoundException,
+)
 from src.models.order import Order
 from src.repositories.interfaces.i_cart_repo import ICartRepository
 from src.repositories.interfaces.i_coupon_repo import ICouponRepository
+from src.repositories.interfaces.i_custom_request_repo import ICustomRequestRepository
 from src.repositories.interfaces.i_order_repo import IOrderRepository
 from src.repositories.interfaces.i_product_repo import IProductRepository
-from src.repositories.interfaces.i_custom_request_repo import ICustomRequestRepository
+from src.schemas.custom_request import CustomRequestCreate
 from src.schemas.order import CheckoutRequest
 from src.services.coupon_service import CouponService
-from src.services.shipping_service import ShippingService
 from src.services.custom_request_service import CustomRequestService
-from src.schemas.custom_request import CustomRequestCreate
+from src.services.shipping_service import ShippingService
 
 
 class OrderService:

@@ -6,7 +6,7 @@ import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import api from "@/lib/api";
+import api, { getApiErrorMessage } from "@/lib/api";
 import toast from "react-hot-toast";
 
 export default function CartPage() {
@@ -23,8 +23,8 @@ export default function CartPage() {
     try {
       const res = await api.post("/shipping/calculate", { method });
       setShippingCost(res.data.cost);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      toast.error("Não foi possível recalcular o frete.");
     }
   };
 
@@ -34,12 +34,12 @@ export default function CartPage() {
       const res = await api.post("/coupons/validate", { code: couponCode });
       if (res.data.valid) {
         setDiscountPercent(res.data.discount_percent);
-        alert(res.data.message);
+        toast.success(res.data.message);
       } else {
-        alert(res.data.message);
+        toast.error(res.data.message);
         setDiscountPercent(0);
       }
-    } catch (err) {
+    } catch {
       toast.error("Erro ao validar cupom");
     }
   };
@@ -61,8 +61,8 @@ export default function CartPage() {
           window.location.href = order.payment_link;
         }
       }
-    } catch (err: any) {
-      toast.error(err.response?.data?.detail || "Erro ao finalizar compra");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Erro ao finalizar compra"));
     }
   };
 
@@ -72,10 +72,10 @@ export default function CartPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="text-center mt-20 glass p-12 max-w-lg mx-auto rounded-3xl">
+      <div className="text-center mt-20 glass p-12 max-w-lg mx-auto rounded-lg">
         <h2 className="text-3xl font-display font-bold mb-4">Carrinho Vazio</h2>
         <p className="text-lunart-white/60 mb-8">Parece que você ainda não escolheu nenhuma estrela para a sua coleção.</p>
-        <Link href="/" className="bg-lunart-purple-600 px-8 py-3 rounded-xl font-bold hover:bg-lunart-purple-500 transition-colors">
+        <Link href="/" className="soft-button bg-lunart-purple-600 px-8 py-3 text-white hover:bg-lunart-purple-500">
           Explorar Loja
         </Link>
       </div>
@@ -87,14 +87,12 @@ export default function CartPage() {
   const total = subtotal + shippingCost - discount;
 
   return (
-    <div className="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
-      {/* Items */}
+    <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3">
       <div className="lg:col-span-2 flex flex-col gap-4">
         <h1 className="text-3xl font-display font-bold mb-4">Seu Carrinho</h1>
         {cart.items.map((item) => (
-          <div key={item.id} className="glass p-4 rounded-2xl flex items-center gap-4">
-            <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-lunart-surface-light shrink-0">
+          <div key={item.id} className="glass flex flex-col gap-4 rounded-lg p-4 sm:flex-row sm:items-center">
+            <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-lunart-surface-light">
               <Image src={item.product_image_url || "/Lunart-Header.jpg"} alt={item.product_name} fill className="object-cover" />
             </div>
             <div className="flex-1">
@@ -103,20 +101,23 @@ export default function CartPage() {
               </h3>
               <p className="text-lunart-pink-300 font-bold">R$ {Number(item.product_price).toFixed(2)}</p>
             </div>
-            <div className="flex items-center gap-3 bg-lunart-surface-light rounded-lg p-1">
+            <div className="flex w-fit items-center gap-3 rounded-lg bg-lunart-surface-light p-1">
               <button 
                 onClick={() => updateQuantity({ itemId: item.id, quantity: Math.max(1, item.quantity - 1)})}
                 className="w-8 h-8 flex items-center justify-center hover:bg-lunart-purple-600 rounded-md"
+                aria-label={`Diminuir quantidade de ${item.product_name}`}
               >-</button>
               <span className="w-4 text-center">{item.quantity}</span>
               <button 
                 onClick={() => updateQuantity({ itemId: item.id, quantity: item.quantity + 1})}
                 className="w-8 h-8 flex items-center justify-center hover:bg-lunart-purple-600 rounded-md"
+                aria-label={`Aumentar quantidade de ${item.product_name}`}
               >+</button>
             </div>
             <button 
               onClick={() => removeItem(item.id)}
-              className="p-3 text-red-400 hover:bg-red-500/20 rounded-xl transition-colors"
+              className="w-fit rounded-lg p-3 text-red-300 transition-colors hover:bg-red-500/20"
+              aria-label={`Remover ${item.product_name} do carrinho`}
             >
               <Trash2 className="w-5 h-5" />
             </button>
@@ -124,8 +125,7 @@ export default function CartPage() {
         ))}
       </div>
 
-      {/* Resumo */}
-      <div className="glass p-6 rounded-3xl h-fit sticky top-24">
+      <div className="glass h-fit rounded-lg p-6 lg:sticky lg:top-24">
         <h2 className="text-xl font-bold mb-6">Resumo da Compra</h2>
         
         <div className="space-y-4 mb-6">
@@ -139,7 +139,7 @@ export default function CartPage() {
             <select 
               value={shippingMethod}
               onChange={(e) => calculateShipping(e.target.value)}
-              className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-2 focus:outline-none focus:border-lunart-pink-400"
+              className="form-field"
             >
               <option value="mercado_envios">Correios (Sedex / PAC)</option>
               <option value="pickup">Retirar na Loja (Chat para agendar)</option>
@@ -159,11 +159,11 @@ export default function CartPage() {
                 value={couponCode}
                 onChange={e => setCouponCode(e.target.value)}
                 placeholder="LUNART20"
-                className="flex-1 bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-2 focus:outline-none focus:border-lunart-pink-400 uppercase"
+                className="form-field flex-1 uppercase"
               />
               <button 
                 onClick={applyCoupon}
-                className="px-4 bg-lunart-purple-600 hover:bg-lunart-purple-500 rounded-xl font-medium"
+                className="soft-button bg-lunart-purple-600 text-white hover:bg-lunart-purple-500"
               >
                 Aplicar
               </button>
@@ -190,7 +190,7 @@ export default function CartPage() {
         <button 
           onClick={handleCheckout}
           disabled={isPending}
-          className="w-full bg-lunart-pink-500 hover:bg-lunart-pink-400 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
+          className="soft-button w-full bg-lunart-pink-500 py-4 text-lg text-white hover:bg-lunart-pink-400"
         >
           {isPending ? "Processando..." : "Finalizar Compra"}
         </button>

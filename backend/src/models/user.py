@@ -1,9 +1,15 @@
 from datetime import date, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base
+
+if TYPE_CHECKING:
+    from src.models.cart import Cart
+    from src.models.custom_request import CustomRequest
+    from src.models.order import Order
 
 
 class User(Base):

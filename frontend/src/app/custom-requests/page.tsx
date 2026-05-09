@@ -5,6 +5,7 @@ import { useCustomRequests } from "@/hooks/useCustomRequests";
 import Link from "next/link";
 import { useState } from "react";
 import { Plus, MessageSquare } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function CustomRequestsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -15,7 +16,17 @@ export default function CustomRequestsPage() {
 
   if (authLoading) return null;
   if (!isAuthenticated) {
-    return <div className="text-center mt-20">Você precisa estar logado para ver seus pedidos sob encomenda. <Link href="/login" className="text-lunart-pink-400">Fazer login</Link></div>;
+    return (
+      <div className="mx-auto mt-20 max-w-lg rounded-lg glass p-8 text-center">
+        <h1 className="mb-3 text-2xl font-bold">Entre para criar encomendas</h1>
+        <p className="mb-6 text-lunart-white/60">
+          Pedidos personalizados precisam de uma conta para manter o histórico do chat.
+        </p>
+        <Link href="/login" className="soft-button bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">
+          Fazer login
+        </Link>
+      </div>
+    );
   }
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -25,25 +36,26 @@ export default function CustomRequestsPage() {
       setIsCreating(false);
       setSubject("");
       setMessage("");
-    } catch (err) {
-      alert("Erro ao criar pedido.");
+      toast.success("Pedido criado com sucesso!");
+    } catch {
+      toast.error("Erro ao criar pedido.");
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto w-full">
-      <div className="flex justify-between items-center mb-8">
+      <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-3xl font-display font-bold">Pedidos Sob Encomenda</h1>
         <button 
           onClick={() => setIsCreating(!isCreating)}
-          className="flex items-center gap-2 bg-lunart-purple-600 hover:bg-lunart-purple-500 px-4 py-2 rounded-full font-medium transition-colors"
+          className="soft-button gap-2 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500"
         >
           <Plus className="w-5 h-5" /> Novo Pedido
         </button>
       </div>
 
       {isCreating && (
-        <form onSubmit={handleCreate} className="glass p-6 rounded-2xl mb-8 animate-slide-up">
+        <form onSubmit={handleCreate} className="glass mb-8 rounded-lg p-6 animate-slide-up">
           <h2 className="text-xl font-bold mb-4">Descreva sua ideia</h2>
           <div className="flex flex-col gap-4">
             <input 
@@ -52,7 +64,7 @@ export default function CustomRequestsPage() {
               placeholder="Assunto (ex: Colar de Lua de Quartzo)"
               value={subject}
               onChange={e => setSubject(e.target.value)}
-              className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-3 focus:outline-none focus:border-lunart-pink-400"
+              className="form-field"
             />
             <textarea 
               required
@@ -60,11 +72,11 @@ export default function CustomRequestsPage() {
               value={message}
               onChange={e => setMessage(e.target.value)}
               rows={4}
-              className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-xl px-4 py-3 focus:outline-none focus:border-lunart-pink-400"
+              className="form-field"
             />
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setIsCreating(false)} className="px-4 py-2 hover:bg-lunart-surface-light rounded-xl">Cancelar</button>
-              <button type="submit" className="bg-lunart-pink-500 hover:bg-lunart-pink-400 px-6 py-2 rounded-xl font-bold transition-colors">Enviar Pedido</button>
+              <button type="button" onClick={() => setIsCreating(false)} className="soft-button hover:bg-lunart-surface-light">Cancelar</button>
+              <button type="submit" className="soft-button bg-lunart-pink-500 text-white hover:bg-lunart-pink-400">Enviar Pedido</button>
             </div>
           </div>
         </form>
@@ -73,7 +85,7 @@ export default function CustomRequestsPage() {
       {isLoading ? (
         <div className="text-center">Carregando...</div>
       ) : requests?.length === 0 ? (
-        <div className="text-center text-lunart-white/60 py-12 glass rounded-2xl">
+        <div className="text-center text-lunart-white/60 py-12 glass rounded-lg">
           Você ainda não fez nenhum pedido customizado.
         </div>
       ) : (
@@ -82,7 +94,7 @@ export default function CustomRequestsPage() {
             <Link 
               href={`/custom-requests/${req.id}`} 
               key={req.id}
-              className="glass p-5 rounded-2xl flex items-center justify-between hover:border-lunart-pink-400 transition-colors"
+              className="glass flex flex-col gap-4 rounded-lg p-5 transition-colors hover:border-lunart-pink-400 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
                 <h3 className="font-bold text-lg">{req.subject}</h3>

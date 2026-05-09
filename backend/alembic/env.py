@@ -1,15 +1,23 @@
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from alembic import context
 from src.core.config import settings
-from src.models.base import Base
 
 # Import all models so their metadata is registered with Base
-from src.models import user, product, cart, order, coupon, message, custom_request  # noqa: F401
+from src.models import (  # noqa: F401
+    cart,
+    coupon,
+    custom_request,
+    message,
+    order,
+    product,
+    user,
+)
+from src.models.base import Base
 
 config = context.config
 

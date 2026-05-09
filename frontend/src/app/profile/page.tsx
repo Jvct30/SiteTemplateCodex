@@ -4,16 +4,21 @@ import { useAuth } from "@/providers/auth-provider";
 import { useOrders } from "@/hooks/useOrders";
 import { useRouter } from "next/navigation";
 import { Package } from "lucide-react";
-import Image from "next/image";
+import { useEffect } from "react";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { orders, isLoading: ordersLoading } = useOrders();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
   if (authLoading) return null;
   if (!isAuthenticated || !user) {
-    router.push("/login");
     return null;
   }
 
@@ -21,7 +26,7 @@ export default function ProfilePage() {
     <div className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-8">
       
       {/* Sidebar: User Info */}
-      <div className="glass p-6 rounded-3xl h-fit">
+      <div className="glass h-fit rounded-lg p-6">
         <div className="w-24 h-24 bg-lunart-gradient rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-bold">
           {user.full_name.charAt(0)}
         </div>
@@ -52,13 +57,13 @@ export default function ProfilePage() {
         {ordersLoading ? (
           <div>Carregando...</div>
         ) : orders?.length === 0 ? (
-          <div className="glass p-8 rounded-3xl text-center">
+          <div className="glass rounded-lg p-8 text-center">
             <p className="text-lunart-white/60">Você ainda não realizou nenhum pedido.</p>
           </div>
         ) : (
           <div className="space-y-6">
             {orders?.map(order => (
-              <div key={order.id} className="glass p-6 rounded-3xl">
+          <div key={order.id} className="glass rounded-lg p-6">
                 <div className="flex flex-wrap justify-between items-center mb-4 pb-4 border-b border-lunart-white/10">
                   <div>
                     <div className="font-bold">Pedido #{order.id}</div>
@@ -68,7 +73,7 @@ export default function ProfilePage() {
                     <span className="text-xl font-bold text-transparent bg-clip-text bg-hero-gradient">
                       R$ {Number(order.total).toFixed(2)}
                     </span>
-                    <span className="bg-lunart-surface-light px-3 py-1 rounded-full text-xs font-bold uppercase">
+                    <span className="rounded-full bg-lunart-surface-light px-3 py-1 text-xs font-bold uppercase">
                       {order.status}
                     </span>
                   </div>
@@ -94,7 +99,7 @@ export default function ProfilePage() {
                       href={order.payment_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block bg-green-600 hover:bg-green-500 px-6 py-2 rounded-xl font-bold text-sm transition-colors"
+                          className="soft-button bg-green-600 px-6 py-2 text-white hover:bg-green-500"
                     >
                       Pagar Agora (Mercado Pago)
                     </a>

@@ -4,10 +4,12 @@ import { useProduct } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { triggerStars } from "@/lib/confetti";
-import { ShoppingCart, Star } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Star } from "lucide-react";
+import { getApiErrorMessage } from "@/lib/api";
+import Link from "next/link";
 
 export default function ProductDetails() {
   const params = useParams();
@@ -17,12 +19,6 @@ export default function ProductDetails() {
   const [adding, setAdding] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState<string>("");
 
-  useEffect(() => {
-    if (product?.variations && product.variations.length > 0) {
-      setSelectedVariation(product.variations[0]);
-    }
-  }, [product]);
-
   if (isLoading) {
     return <div className="flex justify-center mt-20"><div className="w-12 h-12 rounded-full border-4 border-lunart-purple-500 border-t-transparent animate-spin"></div></div>;
   }
@@ -31,18 +27,24 @@ export default function ProductDetails() {
     return <div className="text-center mt-20 text-xl">Produto não encontrado.</div>;
   }
 
+  const variations = product.variations ?? [];
+  const activeVariation =
+    selectedVariation && variations.includes(selectedVariation)
+      ? selectedVariation
+      : variations[0] ?? "";
+
   const handleAddToCart = async (e: React.MouseEvent) => {
     try {
       setAdding(true);
       await addToCart({ 
         productId: product.id, 
         quantity: 1, 
-        variation: selectedVariation || undefined 
+        variation: activeVariation || undefined 
       });
       triggerStars(e);
       toast.success("Adicionado ao carrinho!");
-    } catch (err: any) {
-      toast.error(err.response?.data?.detail || "Faça login para adicionar ao carrinho.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Faça login para adicionar ao carrinho."));
     } finally {
       setAdding(false);
     }
@@ -50,10 +52,13 @@ export default function ProductDetails() {
 
   return (
     <div className="max-w-5xl mx-auto w-full mt-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 glass p-8 rounded-3xl animate-slide-up">
-        
-        {/* Imagem */}
-        <div className="relative aspect-square rounded-2xl overflow-hidden bg-lunart-surface-light border border-lunart-purple-500/20">
+      <Link href="/" className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-lunart-white/65 transition-colors hover:text-lunart-pink-300">
+        <ArrowLeft className="h-4 w-4" />
+        Voltar para a loja
+      </Link>
+
+      <div className="grid grid-cols-1 gap-10 rounded-lg glass p-5 animate-slide-up md:grid-cols-2 md:p-8">
+        <div className="relative aspect-square overflow-hidden rounded-lg border border-lunart-white/10 bg-lunart-surface-light">
           <Image
             src={product.image_url || "/Lunart-Header.jpg"}
             alt={product.name}
@@ -62,7 +67,6 @@ export default function ProductDetails() {
           />
         </div>
 
-        {/* Detalhes */}
         <div className="flex flex-col">
           <div className="flex items-center gap-2 mb-2 text-lunart-star">
             <Star className="w-5 h-5 fill-lunart-star" />
@@ -77,17 +81,17 @@ export default function ProductDetails() {
             {product.description || "Esta é uma peça única, feita com muito amor e poeira estelar."}
           </p>
 
-          {product.variations && product.variations.length > 0 && (
+          {variations.length > 0 && (
             <div className="mb-8">
               <span className="text-sm text-lunart-white/60 block mb-3">Escolha a Variação</span>
               <div className="flex flex-wrap gap-3">
-                {product.variations.map((v) => (
+                {variations.map((v) => (
                   <button
                     key={v}
                     onClick={() => setSelectedVariation(v)}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all border ${
-                      selectedVariation === v 
-                        ? "bg-lunart-purple-600 border-lunart-purple-400 text-white shadow-[0_0_15px_rgba(124,58,237,0.5)]" 
+                    className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-all ${
+                      activeVariation === v 
+                        ? "border-lunart-purple-400 bg-lunart-purple-600 text-white" 
                         : "bg-lunart-surface-light border-lunart-purple-500/20 text-lunart-white/70 hover:border-lunart-purple-400"
                     }`}
                   >
@@ -110,7 +114,7 @@ export default function ProductDetails() {
               <button 
                 onClick={handleAddToCart}
                 disabled={adding || product.stock <= 0}
-                className="flex-1 flex items-center justify-center gap-2 bg-lunart-purple-600 hover:bg-lunart-purple-500 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
+                className="soft-button flex-1 gap-2 bg-lunart-purple-600 py-4 text-lg text-white hover:bg-lunart-purple-500"
               >
                 <ShoppingCart className="w-6 h-6" />
                 {product.stock <= 0 ? "Esgotado" : adding ? "Adicionando..." : "Adicionar ao Carrinho"}

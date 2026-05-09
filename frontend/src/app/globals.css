@@ -4,13 +4,31 @@
 @layer base {
   body {
     @apply bg-lunart-bg text-lunart-white min-h-screen font-sans;
-    background: linear-gradient(180deg, #0f0a1a, #1a1230, #241a40);
+    background:
+      radial-gradient(circle at 50% -20%, rgba(186, 230, 253, 0.14), transparent 34rem),
+      linear-gradient(180deg, #0f0a1a 0%, #151022 42%, #1b1530 100%);
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lunart-pink-300 focus-visible:ring-offset-2 focus-visible:ring-offset-lunart-bg;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-lunart-surface/60 backdrop-blur-md border border-lunart-purple-300/15;
+    @apply border border-lunart-white/10 bg-lunart-surface/75 shadow-[0_18px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl;
+  }
+
+  .form-field {
+    @apply w-full rounded-lg border border-lunart-white/10 bg-lunart-surface-light px-4 py-3 text-sm text-lunart-white placeholder:text-lunart-white/35 transition-colors focus:border-lunart-pink-300;
+  }
+
+  .soft-button {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
   }
   
   /* Custom scrollbar */

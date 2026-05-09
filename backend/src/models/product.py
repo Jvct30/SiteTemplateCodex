@@ -1,10 +1,15 @@
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Numeric, String, Text, func, JSON
+from sqlalchemy import JSON, Boolean, Numeric, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models.base import Base
+
+if TYPE_CHECKING:
+    from src.models.cart import CartItem
+    from src.models.order import OrderItem
 
 
 class Product(Base):

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import bcrypt
 import jwt
@@ -19,7 +19,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 def create_access_token(data: dict[str, str | int]) -> str:
     """Create a JWT access token with an expiration claim."""
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(
+    expire = datetime.now(UTC) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     to_encode["exp"] = int(expire.timestamp())

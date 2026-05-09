@@ -24,8 +24,18 @@ class CartService:
         product = await self.product_repo.get_by_id(product_id)
         if not product or not product.is_active:
             raise NotFoundException("Produto indisponível")
-            
-        existing_item = await self.cart_repo.get_item(cart.id, product_id, variation)
+
+        selected_variation = variation.strip() if variation else None
+        if product.variations:
+            selected_variation = selected_variation or product.variations[0]
+            if selected_variation not in product.variations:
+                raise ConflictException("Variação indisponível para este produto")
+        else:
+            selected_variation = None
+
+        existing_item = await self.cart_repo.get_item(
+            cart.id, product_id, selected_variation
+        )
         
         total_qty = existing_item.quantity + quantity if existing_item else quantity
         if product.stock < total_qty:
@@ -35,7 +45,9 @@ class CartService:
             item = await self.cart_repo.update_item_quantity(existing_item.id, total_qty)
             return item  # type: ignore
         else:
-            return await self.cart_repo.add_item(cart.id, product_id, quantity, variation)
+            return await self.cart_repo.add_item(
+                cart.id, product_id, quantity, selected_variation
+            )
 
     async def update_item_quantity(self, user_id: int, item_id: int, quantity: int) -> CartItem:
         cart = await self.get_cart(user_id)

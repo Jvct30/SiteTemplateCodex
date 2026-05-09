@@ -33,8 +33,8 @@ async def get_current_user(
         if user_id_str is None:
             raise CredentialsException()
         user_id = int(user_id_str)
-    except (jwt.PyJWTError, ValueError):
-        raise CredentialsException()
+    except (jwt.PyJWTError, ValueError) as exc:
+        raise CredentialsException() from exc
 
     user = await db.get(User, user_id)
     if user is None or not user.is_active:

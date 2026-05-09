@@ -13,8 +13,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "Lunart | E-commerce Artesanal",
-  description: "Artesanato com alma de estrela. Produtos únicos, peças customizadas e muito mais.",
+  title: "Lunart | Artesanato Autoral",
+  description:
+    "Peças artesanais autorais, presentes afetivos e encomendas personalizadas feitas pela Lunart.",
 };
 
 export default function RootLayout({
@@ -23,9 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className="scroll-smooth">
       <body
-        className={`${inter.variable} ${outfit.variable} font-sans antialiased relative`}
+        className={`${inter.variable} ${outfit.variable} relative min-h-screen overflow-x-hidden font-sans antialiased`}
       >
         <QueryProvider>
           <AuthProvider>
@@ -41,7 +42,7 @@ export default function RootLayout({
             />
             <StarField />
             <Header />
-            <main className="relative z-10 flex flex-col flex-1 container mx-auto px-4 py-8">
+            <main className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8 sm:px-6 lg:px-8">
               {children}
             </main>
             <Footer />

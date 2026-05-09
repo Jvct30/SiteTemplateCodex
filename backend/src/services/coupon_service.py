@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from src.core.exceptions import BadRequestException, NotFoundException
 from src.models.coupon import Coupon
@@ -57,7 +57,7 @@ class CouponService:
         if coupon.max_uses and coupon.current_uses >= coupon.max_uses:
             return CouponValidateResponse(valid=False, message="Cupom atingiu o limite de usos")
             
-        if coupon.expires_at and coupon.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+        if coupon.expires_at and coupon.expires_at.replace(tzinfo=UTC) < datetime.now(UTC):
             return CouponValidateResponse(valid=False, message="Cupom expirado")
             
         return CouponValidateResponse(

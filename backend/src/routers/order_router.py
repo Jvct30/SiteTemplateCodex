@@ -5,9 +5,9 @@ from src.core.dependencies import get_current_user, get_db
 from src.models.user import User
 from src.repositories.cart_repo import CartRepository
 from src.repositories.coupon_repo import CouponRepository
+from src.repositories.custom_request_repo import CustomRequestRepository
 from src.repositories.order_repo import OrderRepository
 from src.repositories.product_repo import ProductRepository
-from src.repositories.custom_request_repo import CustomRequestRepository
 from src.schemas.order import CheckoutRequest, OrderResponse
 from src.services.order_service import OrderService
 

@@ -11,24 +11,28 @@ interface Star {
   delay: number;
 }
 
+const stars: Star[] = Array.from({ length: 64 }, (_, i) => {
+  const xSeed = Math.sin(i * 12.9898) * 43758.5453;
+  const ySeed = Math.sin(i * 78.233) * 24634.6345;
+  const sizeSeed = Math.sin(i * 39.425) * 9658.234;
+
+  return {
+    id: i,
+    x: Math.abs(xSeed % 100),
+    y: Math.abs(ySeed % 100),
+    size: Math.abs(sizeSeed % 1.8) + 0.8,
+    duration: Math.abs((xSeed + ySeed) % 3) + 2.5,
+    delay: Math.abs(sizeSeed % 2.5),
+  };
+});
+
 export function StarField() {
-  const [stars, setStars] = useState<Star[]>([]);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const newStars = Array.from({ length: 50 }).map((_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 2 + 1,
-      duration: Math.random() * 3 + 2,
-      delay: Math.random() * 2,
-    }));
-    setStars(newStars);
-
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({
-        x: (e.clientX / window.innerWidth - 0.5) * 20, // max 20px translation
+        x: (e.clientX / window.innerWidth - 0.5) * 16,
         y: (e.clientY / window.innerHeight - 0.5) * 20,
       });
     };
@@ -51,17 +55,9 @@ export function StarField() {
             animationDuration: `${star.duration}s`,
             animationDelay: `${star.delay}s`,
             transform: `translate(${mousePos.x * (star.size / 3)}px, ${mousePos.y * (star.size / 3)}px)`,
-          }}
-        />
+        }}
+      />
       ))}
-      <div 
-        className="absolute top-20 right-20 w-32 h-32 rounded-full bg-lunart-moon/20 blur-3xl transition-transform duration-1000 ease-out" 
-        style={{ transform: `translate(${mousePos.x * 2}px, ${mousePos.y * 2}px)` }}
-      />
-      <div 
-        className="absolute bottom-20 left-10 w-48 h-48 rounded-full bg-lunart-purple-600/10 blur-3xl transition-transform duration-1000 ease-out" 
-        style={{ transform: `translate(${mousePos.x * -1}px, ${mousePos.y * -1}px)` }}
-      />
     </div>
   );
 }

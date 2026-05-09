@@ -2,6 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
 
+
 class Notice(Base):
     __tablename__ = "notices"
 

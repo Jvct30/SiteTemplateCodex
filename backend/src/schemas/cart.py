@@ -8,6 +8,7 @@ class CartItemAdd(BaseModel):
 
     product_id: int
     quantity: int = Field(gt=0, default=1)
+    variation: str | None = None
 
 
 class CartItemUpdate(BaseModel):

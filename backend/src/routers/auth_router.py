@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.dependencies import get_db
-from src.repositories.user_repo import UserRepository
 from src.repositories.cart_repo import CartRepository
+from src.repositories.user_repo import UserRepository
 from src.schemas.auth import LoginRequest, TokenResponse
 from src.schemas.user import UserCreate, UserResponse
 from src.services.auth_service import AuthService

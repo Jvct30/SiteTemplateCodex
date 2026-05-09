@@ -1,16 +1,16 @@
 import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
+
 from src.core.security import hash_password
 from src.models.cart import Cart
 from src.models.coupon import Coupon
-from src.models.db import engine, async_session
+from src.models.db import async_session, engine
 from src.models.message import HomepageMessage
 from src.models.product import Product
 from src.models.user import User
-from src.models.order import Order, OrderItem
-from src.models.custom_request import CustomRequest, CustomRequestMessage
+
 
 async def seed_data():
     async with async_session() as session:
@@ -95,7 +95,7 @@ async def seed_data():
                 discount_percent=10,
                 max_uses=100,
                 is_active=True,
-                expires_at=datetime.now(timezone.utc) + timedelta(days=30)
+                expires_at=datetime.now(UTC) + timedelta(days=30)
             )
             session.add(coupon)
 

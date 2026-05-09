@@ -16,7 +16,12 @@ class ProductRepository(IProductRepository):
         return await self.session.get(Product, product_id)
 
     async def list_active(self, skip: int = 0, limit: int = 50) -> list[Product]:
-        stmt = select(Product).where(Product.is_active == True, Product.stock > 0).offset(skip).limit(limit)
+        stmt = (
+            select(Product)
+            .where(Product.is_active.is_(True), Product.stock > 0)
+            .offset(skip)
+            .limit(limit)
+        )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
@@ -32,6 +37,7 @@ class ProductRepository(IProductRepository):
             price=data.price,
             stock=data.stock,
             image_url=data.image_url,
+            variations=data.variations,
             is_active=True,
         )
         self.session.add(product)

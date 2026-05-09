@@ -1,17 +1,15 @@
 "use client";
 
 import { useAuth } from "@/providers/auth-provider";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import api from "@/lib/api";
+import api, { getApiErrorMessage } from "@/lib/api";
 import toast from "react-hot-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { Megaphone, PackagePlus, Trash2 } from "lucide-react";
 
 export default function AdminPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
   const { products } = useProducts();
   const queryClient = useQueryClient();
   
@@ -37,8 +35,8 @@ export default function AdminPage() {
       });
       setImageUrl(res.data.url);
       toast.success("Imagem enviada com sucesso!");
-    } catch (err) {
-      toast.error("Erro ao enviar imagem.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Erro ao enviar imagem."));
     } finally {
       setUploading(false);
     }
@@ -50,8 +48,8 @@ export default function AdminPage() {
       await api.post("/admin/notice", { message: noticeText, is_active: true });
       toast.success("Aviso ativado com sucesso!");
       setNoticeText("");
-    } catch (err) {
-      toast.error("Erro ao ativar aviso.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Erro ao ativar aviso."));
     }
   };
 
@@ -59,8 +57,8 @@ export default function AdminPage() {
     try {
       await api.delete("/admin/notice");
       toast.success("Aviso removido!");
-    } catch (err) {
-      toast.error("Erro ao remover aviso.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Erro ao remover aviso."));
     }
   };
 
@@ -70,8 +68,8 @@ export default function AdminPage() {
       await api.delete(`/admin/products/${id}`);
       toast.success("Produto removido com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
-    } catch (err) {
-      toast.error("Erro ao remover produto.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Erro ao remover produto."));
     }
   };
 
@@ -89,17 +87,20 @@ export default function AdminPage() {
         price: parseFloat(productPrice),
         stock: parseInt(productStock, 10),
         image_url: imageUrl || null,
-        variations: variations.trim() ? variations.split(",").map(v => v.trim()) : null
+        variations: variations.trim()
+          ? variations.split(",").map((v) => v.trim()).filter(Boolean)
+          : null
       });
       toast.success("Produto criado com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       setProductName("");
       setProductPrice("");
       setProductStock("");
       setProductDesc("");
       setImageUrl("");
       setVariations("");
-    } catch (err) {
-      toast.error("Erro ao criar produto.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Erro ao criar produto."));
     }
   };
 
@@ -109,58 +110,62 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        {/* Create Product Form */}
-        <div className="glass p-6 rounded-3xl">
-          <h2 className="text-xl font-bold mb-4">Adicionar Produto</h2>
+        <div className="glass rounded-lg p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+            <PackagePlus className="h-5 w-5 text-lunart-pink-300" />
+            Adicionar Produto
+          </h2>
           <form onSubmit={handleCreateProduct} className="flex flex-col gap-4">
             <div>
               <label className="block text-xs mb-1">Nome</label>
-              <input type="text" required value={productName} onChange={e=>setProductName(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" />
+              <input type="text" required value={productName} onChange={e=>setProductName(e.target.value)} className="form-field" />
             </div>
             <div className="flex gap-4">
               <div className="flex-1">
                 <label className="block text-xs mb-1">Preço</label>
-                <input type="number" step="0.01" required value={productPrice} onChange={e=>setProductPrice(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" />
+                <input type="number" step="0.01" min="0" required value={productPrice} onChange={e=>setProductPrice(e.target.value)} className="form-field" />
               </div>
               <div className="flex-1">
                 <label className="block text-xs mb-1">Estoque</label>
-                <input type="number" required value={productStock} onChange={e=>setProductStock(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" />
+                <input type="number" min="0" required value={productStock} onChange={e=>setProductStock(e.target.value)} className="form-field" />
               </div>
             </div>
             <div>
               <label className="block text-xs mb-1">Upload de Imagem</label>
-              <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm text-lunart-white/60 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-lunart-purple-600 file:text-white hover:file:bg-lunart-purple-500" />
+              <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="form-field file:mr-4 file:rounded-full file:border-0 file:bg-lunart-purple-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-lunart-purple-500" />
               {uploading && <span className="text-xs text-lunart-pink-400 mt-1 block">Enviando...</span>}
               {imageUrl && <span className="text-xs text-green-400 mt-1 block">Imagem pronta! ({imageUrl})</span>}
             </div>
             <div>
               <label className="block text-xs mb-1">Variações (Separadas por vírgula)</label>
-              <input type="text" value={variations} onChange={e=>setVariations(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" placeholder="Ex: Rosa, Azul, Pequeno, Grande" />
+              <input type="text" value={variations} onChange={e=>setVariations(e.target.value)} className="form-field" placeholder="Ex: Rosa, Azul, Pequeno, Grande" />
             </div>
             <div>
               <label className="block text-xs mb-1">Descrição</label>
-              <textarea value={productDesc} onChange={e=>setProductDesc(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" rows={3}></textarea>
+              <textarea value={productDesc} onChange={e=>setProductDesc(e.target.value)} className="form-field" rows={3}></textarea>
             </div>
-            <button type="submit" className="bg-lunart-purple-600 hover:bg-lunart-purple-500 py-2 rounded-lg font-bold text-sm mt-2">Criar Produto</button>
+            <button type="submit" className="soft-button mt-2 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">Criar Produto</button>
           </form>
         </div>
 
         {/* Info Box */}
         <div className="flex flex-col gap-8">
           {/* Notice Box */}
-          <div className="glass p-6 rounded-3xl">
-            <h2 className="text-xl font-bold mb-4">Aviso da Loja (Homepage)</h2>
+          <div className="glass rounded-lg p-6">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+              <Megaphone className="h-5 w-5 text-lunart-pink-300" />
+              Aviso da Loja
+            </h2>
             <div className="flex flex-col gap-3">
-              <input type="text" value={noticeText} onChange={e=>setNoticeText(e.target.value)} className="w-full bg-lunart-surface-light border border-lunart-purple-500/30 rounded-lg px-3 py-2 text-sm" placeholder="Ex: Estamos em promoção! Use o cupom ESTRELA" />
+              <input type="text" value={noticeText} onChange={e=>setNoticeText(e.target.value)} className="form-field" placeholder="Ex: Estamos em promoção! Use o cupom ESTRELA" />
               <div className="flex gap-2">
-                <button onClick={handleSaveNotice} className="bg-lunart-purple-600 hover:bg-lunart-purple-500 px-4 py-2 rounded-lg font-bold text-xs flex-1">Ativar Aviso</button>
-                <button onClick={handleRemoveNotice} className="bg-red-500/20 text-red-300 border border-red-500/50 hover:bg-red-500/30 px-4 py-2 rounded-lg font-bold text-xs flex-1">Remover Aviso</button>
+                <button onClick={handleSaveNotice} className="soft-button flex-1 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">Ativar</button>
+                <button onClick={handleRemoveNotice} className="soft-button flex-1 border border-red-500/50 bg-red-500/20 text-red-300 hover:bg-red-500/30">Remover</button>
               </div>
             </div>
           </div>
 
-          {/* Product List */}
-          <div className="glass p-6 rounded-3xl max-h-[400px] overflow-y-auto">
+          <div className="glass max-h-[400px] overflow-y-auto rounded-lg p-6">
             <h2 className="text-xl font-bold mb-4">Gerenciar Produtos</h2>
             <div className="flex flex-col gap-2">
               {products?.map(p => (
@@ -179,7 +184,7 @@ export default function AdminPage() {
           </div>
 
 
-          <div className="glass p-6 rounded-3xl">
+          <div className="glass rounded-lg p-6">
             <h2 className="text-xl font-bold mb-4">Avisos Sistema</h2>
             <p className="text-sm text-lunart-white/60 mb-2">
               Para funcionalidades completas de gestão (Pedidos, Cupons, Chats), expanda os endpoints consumindo-os aqui.

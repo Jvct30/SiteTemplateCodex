@@ -16,7 +16,7 @@ class MessageRepository(IMessageRepository):
         return await self.session.get(HomepageMessage, message_id)
 
     async def list_active(self) -> list[HomepageMessage]:
-        stmt = select(HomepageMessage).where(HomepageMessage.is_active == True)
+        stmt = select(HomepageMessage).where(HomepageMessage.is_active.is_(True))
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 

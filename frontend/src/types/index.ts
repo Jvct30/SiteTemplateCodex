@@ -24,6 +24,9 @@ export interface ProductResponse {
   stock: number;
   image_url: string | null;
   is_active: boolean;
+  is_private?: boolean;
+  owner_user_id?: number | null;
+  custom_request_id?: number | null;
   created_at: string;
   variations?: string[] | null;
 }
@@ -98,6 +101,7 @@ export interface CustomRequestResponse {
   user_id: number;
   subject: string;
   status: string;
+  quoted_product_id?: number | null;
   created_at: string;
 }
 
@@ -106,6 +110,7 @@ export interface CustomRequestDetailResponse {
   user_id: number;
   subject: string;
   status: string;
+  quoted_product_id?: number | null;
   created_at: string;
   messages: CustomRequestMessageResponse[];
 }

@@ -5,13 +5,17 @@ import { useState } from "react";
 import api, { getApiErrorMessage } from "@/lib/api";
 import toast from "react-hot-toast";
 import { useProducts } from "@/hooks/useProducts";
+import { useCustomRequests } from "@/hooks/useCustomRequests";
 import { useQueryClient } from "@tanstack/react-query";
-import { Megaphone, PackagePlus, Trash2 } from "lucide-react";
+import { Megaphone, MessageSquare, PackagePlus, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 export default function AdminPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { products } = useProducts();
+  const { requests, isLoading: requestsLoading } = useCustomRequests();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<"products" | "customRequests">("products");
   
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("");
@@ -108,7 +112,26 @@ export default function AdminPage() {
     <div className="max-w-4xl mx-auto w-full">
       <h1 className="text-3xl font-display font-bold mb-8 text-lunart-star">Painel Administrativo</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="mb-8 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab("products")}
+          className={`soft-button ${activeTab === "products" ? "bg-lunart-purple-600 text-white" : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"}`}
+        >
+          Produtos
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("customRequests")}
+          className={`soft-button gap-2 ${activeTab === "customRequests" ? "bg-lunart-purple-600 text-white" : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"}`}
+        >
+          <MessageSquare className="h-4 w-4" />
+          Ver pedidos sob encomenda
+        </button>
+      </div>
+
+      {activeTab === "products" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         <div className="glass rounded-lg p-6">
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
@@ -186,6 +209,42 @@ export default function AdminPage() {
         </div>
 
       </div>
+      ) : (
+        <div className="glass rounded-lg p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+            <MessageSquare className="h-5 w-5 text-lunart-pink-300" />
+            Pedidos sob encomenda
+          </h2>
+
+          {requestsLoading ? (
+            <p className="text-sm text-lunart-white/60">Carregando pedidos...</p>
+          ) : requests?.length ? (
+            <div className="flex flex-col gap-3">
+              {requests.map((request) => (
+                <Link
+                  key={request.id}
+                  href={`/custom-requests/${request.id}`}
+                  className="rounded-lg border border-lunart-white/10 bg-lunart-surface-light p-4 transition-colors hover:border-lunart-pink-300"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="font-semibold">{request.subject}</h3>
+                      <p className="text-xs text-lunart-white/45">
+                        Cliente #{request.user_id} • {new Date(request.created_at).toLocaleString("pt-BR")}
+                      </p>
+                    </div>
+                    <span className="w-fit rounded-full bg-lunart-white/10 px-3 py-1 text-xs font-bold uppercase text-lunart-pink-300">
+                      {request.status}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-lunart-white/60">Nenhum pedido sob encomenda encontrado.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

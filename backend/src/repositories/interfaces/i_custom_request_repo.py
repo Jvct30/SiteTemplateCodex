@@ -31,3 +31,9 @@ class ICustomRequestRepository(ABC):
     @abstractmethod
     async def update_status(self, request_id: int, status: str) -> CustomRequest | None:
         pass
+
+    @abstractmethod
+    async def set_quoted_product(
+        self, request_id: int, product_id: int
+    ) -> CustomRequest | None:
+        pass

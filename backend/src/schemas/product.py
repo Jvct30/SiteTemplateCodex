@@ -13,6 +13,9 @@ class ProductCreate(BaseModel):
     stock: int = Field(ge=0)
     image_url: str | None = None
     variations: list[str] | None = None
+    is_private: bool = False
+    owner_user_id: int | None = None
+    custom_request_id: int | None = None
 
 
 class ProductUpdate(BaseModel):
@@ -25,6 +28,9 @@ class ProductUpdate(BaseModel):
     image_url: str | None = None
     is_active: bool | None = None
     variations: list[str] | None = None
+    is_private: bool | None = None
+    owner_user_id: int | None = None
+    custom_request_id: int | None = None
 
 
 class ProductResponse(BaseModel):
@@ -39,5 +45,8 @@ class ProductResponse(BaseModel):
     stock: int
     image_url: str | None
     is_active: bool
+    is_private: bool = False
+    owner_user_id: int | None = None
+    custom_request_id: int | None = None
     created_at: datetime
     variations: list[str] | None = None

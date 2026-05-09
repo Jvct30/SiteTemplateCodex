@@ -18,6 +18,7 @@ from src.schemas.custom_request import (
     CustomRequestDetailResponse,
     CustomRequestMessageCreate,
     CustomRequestMessageResponse,
+    CustomRequestQuoteCreate,
     CustomRequestResponse,
 )
 from src.schemas.message import MessageCreate, MessageResponse, MessageUpdate
@@ -40,13 +41,19 @@ def get_message_service(db: AsyncSession = Depends(get_db)) -> MessageService:
     return MessageService(MessageRepository(db))
 
 def get_order_service(db: AsyncSession = Depends(get_db)) -> OrderService:
-    return OrderService(OrderRepository(db), CartRepository(db), ProductRepository(db), CouponRepository(db))
+    return OrderService(
+        OrderRepository(db),
+        CartRepository(db),
+        ProductRepository(db),
+        CouponRepository(db),
+        CustomRequestRepository(db),
+    )
 
 def get_coupon_service(db: AsyncSession = Depends(get_db)) -> CouponService:
     return CouponService(CouponRepository(db))
 
 def get_custom_request_service(db: AsyncSession = Depends(get_db)) -> CustomRequestService:
-    return CustomRequestService(CustomRequestRepository(db))
+    return CustomRequestService(CustomRequestRepository(db), ProductRepository(db))
 
 # -----------------
 # UPLOAD
@@ -203,3 +210,16 @@ async def reply_request(
     service: CustomRequestService = Depends(get_custom_request_service)
 ):
     return await service.add_message(request_id, current_user.id, "admin", data)
+
+
+@router.post(
+    "/custom-requests/{request_id}/quote",
+    response_model=ProductResponse,
+    status_code=201,
+)
+async def create_custom_request_quote(
+    request_id: int,
+    data: CustomRequestQuoteCreate,
+    service: CustomRequestService = Depends(get_custom_request_service),
+):
+    return await service.create_quote_product(request_id, data)

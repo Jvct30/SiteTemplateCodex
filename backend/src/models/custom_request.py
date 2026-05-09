@@ -23,6 +23,9 @@ class CustomRequest(Base):
     status: Mapped[str] = mapped_column(
         String(20), default="open", nullable=False
     )
+    quoted_product_id: Mapped[int | None] = mapped_column(
+        ForeignKey("products.id"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), nullable=False
     )

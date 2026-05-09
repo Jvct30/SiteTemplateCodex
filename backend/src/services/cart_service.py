@@ -24,6 +24,8 @@ class CartService:
         product = await self.product_repo.get_by_id(product_id)
         if not product or not product.is_active:
             raise NotFoundException("Produto indisponível")
+        if product.is_private and product.owner_user_id != user_id:
+            raise NotFoundException("Produto indisponível")
 
         selected_variation = variation.strip() if variation else None
         if product.variations:
@@ -59,6 +61,8 @@ class CartService:
         product = await self.product_repo.get_by_id(item.product_id)
         if not product or product.stock < quantity:
             raise ConflictException("Estoque insuficiente")
+        if product.is_private and product.owner_user_id != user_id:
+            raise NotFoundException("Item não encontrado no carrinho")
 
         updated_item = await self.cart_repo.update_item_quantity(item_id, quantity)
         return updated_item  # type: ignore

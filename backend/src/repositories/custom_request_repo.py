@@ -59,3 +59,15 @@ class CustomRequestRepository(ICustomRequestRepository):
         req.status = status
         await self.session.flush()
         return req
+
+    async def set_quoted_product(
+        self, request_id: int, product_id: int
+    ) -> CustomRequest | None:
+        req = await self.get_by_id(request_id)
+        if not req:
+            return None
+
+        req.quoted_product_id = product_id
+        req.status = "quoted"
+        await self.session.flush()
+        return req

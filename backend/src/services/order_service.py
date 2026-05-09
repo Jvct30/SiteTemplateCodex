@@ -73,10 +73,13 @@ class OrderService:
         # 1. Check stock and reserve items using decrement_stock
         subtotal = Decimal("0.00")
         items_to_buy = []
+        custom_request_ids: set[int] = set()
         for item in cart.items:
             product = await self.product_repo.get_by_id(item.product_id)
             if not product or not product.is_active:
                 raise ConflictException(f"Produto indisponível: {item.product.name}")
+            if product.is_private and product.owner_user_id != user_id:
+                raise ConflictException(f"Produto indisponível: {product.name}")
                 
             success = await self.product_repo.decrement_stock(product.id, item.quantity)
             if not success:
@@ -89,6 +92,8 @@ class OrderService:
                 "quantity": item.quantity,
                 "unit_price": product.price
             })
+            if product.custom_request_id:
+                custom_request_ids.add(product.custom_request_id)
 
         # 2. Calculate Shipping
         shipping_cost = self.shipping_service.get_cost_sync(data.shipping_method)
@@ -130,14 +135,43 @@ class OrderService:
         # 7. Clear Cart
         await self.cart_repo.clear(cart.id)
         
-        # 8. Handle Pickup Chat Auto-creation
-        if data.shipping_method == "pickup":
-            subject = f"Agendamento de Retirada - Pedido #{order.id}"
-            msg = f"Olá! Seu pedido #{order.id} foi registrado com sucesso. Por favor, nos informe por este chat qual o melhor dia e horário para você vir retirar os produtos!"
-            create_schema = CustomRequestCreate(subject=subject, message=msg)
-            await self.custom_request_service.create_request(user_id, create_schema)
+        # 8. Close quoted custom chats purchased in this checkout
+        for request_id in custom_request_ids:
+            await self.custom_request_service.update_status(request_id, "closed")
+            await self.custom_request_service.request_repo.add_message(
+                request_id,
+                "system",
+                f"Pagamento registrado no pedido #{order.id}. Este chat foi fechado.",
+            )
 
-        # 9. Mock Payment Link
+        # 9. Open post-sale support chat for every sale
+        user = cart.user
+        item_lines = [
+            f"- Produto #{item['product_id']}: {item['quantity']} unidade(s)"
+            for item in items_to_buy
+        ]
+        address = (
+            f"{user.address_street}, {user.address_number}"
+            f" - {user.address_neighborhood}, {user.address_city}/{user.address_state}"
+            f" - CEP {user.address_zip}"
+        )
+        subject = f"Acompanhamento do Pedido #{order.id}"
+        msg = (
+            f"Olá! Seu pedido #{order.id} foi criado com sucesso.\n\n"
+            f"Carrinho: #{cart.id}\n"
+            f"Itens:\n{chr(10).join(item_lines)}\n\n"
+            f"Subtotal: R$ {subtotal:.2f}\n"
+            f"Frete: R$ {shipping_cost:.2f}\n"
+            f"Desconto: R$ {discount:.2f}\n"
+            f"Total: R$ {total:.2f}\n\n"
+            f"Endereço de entrega/retirada cadastrado:\n{address}\n\n"
+            "Confirme por aqui se essas informações estão corretas."
+        )
+        create_schema = CustomRequestCreate(subject=subject, message=msg)
+        followup = await self.custom_request_service.create_request(user_id, create_schema)
+        await self.custom_request_service.update_status(followup.id, "answered")
+
+        # 10. Mock Payment Link
         order.payment_link = f"https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=mock_{order.id}"
 
         # Reload fully populated

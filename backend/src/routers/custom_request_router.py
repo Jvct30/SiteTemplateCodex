@@ -49,3 +49,12 @@ async def send_message(
     service: CustomRequestService = Depends(get_custom_request_service)
 ):
     return await service.add_message(request_id, current_user.id, "customer", data)
+
+
+@router.delete("/{request_id}", response_model=CustomRequestDetailResponse)
+async def cancel_request(
+    request_id: int,
+    current_user: User = Depends(get_current_user),
+    service: CustomRequestService = Depends(get_custom_request_service)
+):
+    return await service.cancel_request(request_id, current_user.id)

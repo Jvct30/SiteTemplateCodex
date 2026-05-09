@@ -18,7 +18,11 @@ class ProductRepository(IProductRepository):
     async def list_active(self, skip: int = 0, limit: int = 50) -> list[Product]:
         stmt = (
             select(Product)
-            .where(Product.is_active.is_(True), Product.stock > 0)
+            .where(
+                Product.is_active.is_(True),
+                Product.is_private.is_(False),
+                Product.stock > 0,
+            )
             .offset(skip)
             .limit(limit)
         )
@@ -38,6 +42,9 @@ class ProductRepository(IProductRepository):
             stock=data.stock,
             image_url=data.image_url,
             variations=data.variations,
+            is_private=data.is_private,
+            owner_user_id=data.owner_user_id,
+            custom_request_id=data.custom_request_id,
             is_active=True,
         )
         self.session.add(product)

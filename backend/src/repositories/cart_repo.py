@@ -16,7 +16,10 @@ class CartRepository(ICartRepository):
         stmt = (
             select(Cart)
             .where(Cart.user_id == user_id)
-            .options(joinedload(Cart.items).joinedload(CartItem.product))
+            .options(
+                joinedload(Cart.user),
+                joinedload(Cart.items).joinedload(CartItem.product),
+            )
         )
         result = await self.session.execute(stmt)
         return result.unique().scalar_one_or_none()

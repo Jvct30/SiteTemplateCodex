@@ -16,6 +16,14 @@ class CustomRequestMessageCreate(BaseModel):
     content: str = Field(min_length=1)
 
 
+class CustomRequestQuoteCreate(BaseModel):
+    """Schema for creating a private quoted product from a custom request."""
+
+    name: str = Field(min_length=1, max_length=255)
+    description: str | None = None
+    price: float = Field(gt=0)
+
+
 class CustomRequestMessageResponse(BaseModel):
     """Schema for returning a chat message."""
 
@@ -37,6 +45,7 @@ class CustomRequestResponse(BaseModel):
     user_id: int
     subject: str
     status: str
+    quoted_product_id: int | None = None
     created_at: datetime
 
 
@@ -49,5 +58,6 @@ class CustomRequestDetailResponse(BaseModel):
     user_id: int
     subject: str
     status: str
+    quoted_product_id: int | None = None
     created_at: datetime
     messages: list[CustomRequestMessageResponse]

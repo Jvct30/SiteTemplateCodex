@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 
 from src.core.config import settings
 from src.core.exceptions import (
@@ -35,11 +36,37 @@ from src.routers import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("lunart")
 
+
+async def ensure_sqlite_columns(conn) -> None:
+    """Add lightweight SQLite columns that create_all cannot add to existing DBs."""
+    columns = {
+        "products": {
+            "is_private": "BOOLEAN NOT NULL DEFAULT 0",
+            "owner_user_id": "INTEGER",
+            "custom_request_id": "INTEGER",
+        },
+        "custom_requests": {
+            "quoted_product_id": "INTEGER",
+        },
+    }
+
+    for table_name, expected_columns in columns.items():
+        existing = await conn.execute(text(f"PRAGMA table_info({table_name})"))
+        existing_names = {row[1] for row in existing.fetchall()}
+        for column_name, column_sql in expected_columns.items():
+            if column_name not in existing_names:
+                await conn.execute(
+                    text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_sql}")
+                )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Auto-create tables for simplicity (Notices, etc)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        if settings.DATABASE_URL.startswith("sqlite"):
+            await ensure_sqlite_columns(conn)
         
     logger.info("Lunart Backend Started 🚀")
     yield

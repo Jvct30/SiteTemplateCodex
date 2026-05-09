@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { LogOut, Menu, ShoppingCart, User, X } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/", label: "Produtos" },
@@ -17,6 +17,7 @@ export function Header() {
   const { cart } = useCart();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartPulsing, setIsCartPulsing] = useState(false);
 
   const cartItemCount = cart?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
   const closeMenu = () => setIsMenuOpen(false);
@@ -26,6 +27,16 @@ export function Header() {
         ? "bg-lunart-white/10 text-lunart-white"
         : "text-lunart-white/70 hover:bg-lunart-white/10 hover:text-lunart-white"
     }`;
+
+  useEffect(() => {
+    const pulseCart = () => {
+      setIsCartPulsing(true);
+      window.setTimeout(() => setIsCartPulsing(false), 650);
+    };
+
+    window.addEventListener("lunart:cart-pulse", pulseCart);
+    return () => window.removeEventListener("lunart:cart-pulse", pulseCart);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-lunart-white/10 bg-lunart-bg/85 backdrop-blur-xl">
@@ -52,11 +63,13 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/cart"
-            className="relative rounded-full p-2 transition-colors hover:bg-lunart-white/10"
+            className={`relative rounded-full p-2 transition-colors hover:bg-lunart-white/10 ${
+              isCartPulsing ? "animate-cart-pop bg-lunart-pink-500/20 text-lunart-pink-300" : ""
+            }`}
             aria-label="Abrir carrinho"
             onClick={closeMenu}
           >
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className={isCartPulsing ? "h-5 w-5 animate-cart-wiggle" : "h-5 w-5"} />
             {cartItemCount > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-lunart-pink-500 px-1 text-xs font-bold">
                 {cartItemCount}

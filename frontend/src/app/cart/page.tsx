@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useState } from "react";
 import api, { getApiErrorMessage } from "@/lib/api";
 import toast from "react-hot-toast";
+import { formatMoney, toCurrencyNumber } from "@/lib/formatters";
 
 export default function CartPage() {
   const { cart, isLoading, updateQuantity, removeItem } = useCart();
@@ -22,7 +23,7 @@ export default function CartPage() {
     setShippingMethod(method);
     try {
       const res = await api.post("/shipping/calculate", { method });
-      setShippingCost(res.data.cost);
+      setShippingCost(toCurrencyNumber(res.data.cost));
     } catch {
       toast.error("Não foi possível recalcular o frete.");
     }
@@ -82,9 +83,10 @@ export default function CartPage() {
     );
   }
 
-  const subtotal = cart.total;
-  const discount = (subtotal * discountPercent) / 100;
-  const total = subtotal + shippingCost - discount;
+  const subtotal = toCurrencyNumber(cart.total);
+  const shipping = toCurrencyNumber(shippingCost);
+  const discount = (subtotal * toCurrencyNumber(discountPercent)) / 100;
+  const total = Math.max(0, subtotal + shipping - discount);
 
   return (
     <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-3">
@@ -99,7 +101,7 @@ export default function CartPage() {
               <h3 className="font-semibold text-lg">
                 {item.product_name} {item.variation && <span className="text-sm font-normal text-lunart-pink-400">({item.variation})</span>}
               </h3>
-              <p className="text-lunart-pink-300 font-bold">R$ {Number(item.product_price).toFixed(2)}</p>
+              <p className="text-lunart-pink-300 font-bold">{formatMoney(item.product_price)}</p>
             </div>
             <div className="flex w-fit items-center gap-3 rounded-lg bg-lunart-surface-light p-1">
               <button 
@@ -131,7 +133,7 @@ export default function CartPage() {
         <div className="space-y-4 mb-6">
           <div className="flex justify-between text-lunart-white/80">
             <span>Subtotal</span>
-            <span>R$ {Number(subtotal).toFixed(2)}</span>
+            <span>{formatMoney(subtotal)}</span>
           </div>
           
           <div className="pt-4 border-t border-lunart-white/10">
@@ -148,7 +150,7 @@ export default function CartPage() {
           
           <div className="flex justify-between text-lunart-white/80">
             <span>Frete</span>
-            <span>R$ {Number(shippingCost).toFixed(2)}</span>
+            <span>{formatMoney(shipping)}</span>
           </div>
 
           <div className="pt-4 border-t border-lunart-white/10">
@@ -173,7 +175,7 @@ export default function CartPage() {
           {discount > 0 && (
             <div className="flex justify-between text-green-400">
               <span>Desconto</span>
-              <span>- R$ {Number(discount).toFixed(2)}</span>
+              <span>- {formatMoney(discount)}</span>
             </div>
           )}
         </div>
@@ -182,7 +184,7 @@ export default function CartPage() {
           <div className="flex justify-between items-center">
             <span className="font-bold">Total Final</span>
             <span className="text-2xl font-bold text-transparent bg-clip-text bg-hero-gradient">
-              R$ {Number(Math.max(0, total)).toFixed(2)}
+              {formatMoney(total)}
             </span>
           </div>
         </div>

@@ -8,7 +8,8 @@ import { ArrowRight, PackageSearch, ShoppingCart, Sparkles } from "lucide-react"
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api, { getApiErrorMessage } from "@/lib/api";
-import { triggerStars } from "@/lib/confetti";
+import { triggerCartPulse, triggerStars } from "@/lib/confetti";
+import { formatMoney } from "@/lib/formatters";
 
 export default function Home() {
   const { products, isLoading } = useProducts();
@@ -39,8 +40,13 @@ export default function Home() {
     try {
       setAddingId(productId);
       await addToCart({ productId, quantity: 1, variation: variation || undefined });
-      triggerStars(e);
-      toast.success("Adicionado ao carrinho!");
+      try {
+        triggerStars(e);
+      } catch {
+        // Visual feedback should never turn a successful cart action into an error.
+      }
+      triggerCartPulse();
+      toast.success("Item adicionado");
     } catch (error) {
       toast.error(
         getApiErrorMessage(error, "Faça login para adicionar este produto ao carrinho.")
@@ -152,7 +158,7 @@ export default function Home() {
                   </Link>
                   <div className="flex items-center justify-between mt-4">
                     <span className="text-xl font-bold text-lunart-pink-300">
-                      R$ {Number(product.price).toFixed(2)}
+                      {formatMoney(product.price)}
                     </span>
                     <button 
                       onClick={(e) =>

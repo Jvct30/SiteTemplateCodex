@@ -9,6 +9,7 @@ import { useCustomRequests } from "@/hooks/useCustomRequests";
 import { useQueryClient } from "@tanstack/react-query";
 import { Megaphone, MessageSquare, PackagePlus, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { formatMoney } from "@/lib/formatters";
 
 export default function AdminPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -195,7 +196,7 @@ export default function AdminPage() {
                 <div key={p.id} className="flex justify-between items-center bg-lunart-surface-light p-3 rounded-lg border border-lunart-white/5">
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold">{p.name}</span>
-                    <span className="text-xs text-lunart-pink-400">R$ {Number(p.price).toFixed(2)} | Estoque: {p.stock}</span>
+                    <span className="text-xs text-lunart-pink-400">{formatMoney(p.price)} | Estoque: {p.stock}</span>
                   </div>
                   <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors">
                     <Trash2 className="w-4 h-4" />

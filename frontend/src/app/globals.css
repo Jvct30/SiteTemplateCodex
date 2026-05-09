@@ -30,6 +30,14 @@
   .soft-button {
     @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
   }
+
+  .animate-cart-pop {
+    animation: cartPop 650ms ease-out;
+  }
+
+  .animate-cart-wiggle {
+    animation: cartWiggle 650ms ease-out;
+  }
   
   /* Custom scrollbar */
   ::-webkit-scrollbar {
@@ -44,4 +52,17 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-lunart-purple-500;
   }
+}
+
+@keyframes cartPop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(244, 114, 182, 0.12); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 114, 182, 0); }
+}
+
+@keyframes cartWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-12deg); }
+  55% { transform: rotate(10deg); }
+  80% { transform: rotate(-4deg); }
 }

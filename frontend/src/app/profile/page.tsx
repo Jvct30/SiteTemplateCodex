@@ -5,6 +5,7 @@ import { useOrders } from "@/hooks/useOrders";
 import { useRouter } from "next/navigation";
 import { Package } from "lucide-react";
 import { useEffect } from "react";
+import { formatMoney } from "@/lib/formatters";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -71,7 +72,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex gap-4 items-center">
                     <span className="text-xl font-bold text-transparent bg-clip-text bg-hero-gradient">
-                      R$ {Number(order.total).toFixed(2)}
+                      {formatMoney(order.total)}
                     </span>
                     <span className="rounded-full bg-lunart-surface-light px-3 py-1 text-xs font-bold uppercase">
                       {order.status}
@@ -88,7 +89,7 @@ export default function ProfilePage() {
                         </span>
                         <span>Produto #{item.product_id} {item.variation && <span className="text-lunart-pink-400">({item.variation})</span>}</span>
                       </div>
-                      <span className="text-lunart-white/60">R$ {Number(item.unit_price).toFixed(2)}</span>
+                      <span className="text-lunart-white/60">{formatMoney(item.unit_price)}</span>
                     </div>
                   ))}
                 </div>

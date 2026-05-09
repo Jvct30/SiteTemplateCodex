@@ -6,10 +6,11 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { triggerStars } from "@/lib/confetti";
+import { triggerCartPulse, triggerStars } from "@/lib/confetti";
 import { ArrowLeft, ShoppingCart, Star } from "lucide-react";
 import { getApiErrorMessage } from "@/lib/api";
 import Link from "next/link";
+import { formatMoney } from "@/lib/formatters";
 
 export default function ProductDetails() {
   const params = useParams();
@@ -41,8 +42,13 @@ export default function ProductDetails() {
         quantity: 1, 
         variation: activeVariation || undefined 
       });
-      triggerStars(e);
-      toast.success("Adicionado ao carrinho!");
+      try {
+        triggerStars(e);
+      } catch {
+        // Visual feedback should never turn a successful cart action into an error.
+      }
+      triggerCartPulse();
+      toast.success("Item adicionado");
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Faça login para adicionar ao carrinho."));
     } finally {
@@ -106,7 +112,7 @@ export default function ProductDetails() {
             <div className="mb-6">
               <span className="text-sm text-lunart-white/60 block mb-1">Preço Final</span>
               <span className="text-5xl font-bold text-transparent bg-clip-text bg-hero-gradient">
-                R$ {Number(product.price).toFixed(2)}
+                {formatMoney(product.price)}
               </span>
             </div>
 

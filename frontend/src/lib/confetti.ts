@@ -22,3 +22,9 @@ export const triggerStars = (e: React.MouseEvent | null) => {
     zIndex: 9999
   });
 };
+
+export const triggerCartPulse = () => {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("lunart:cart-pulse"));
+  }
+};

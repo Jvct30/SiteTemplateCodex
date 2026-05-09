@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.models.base import Base
 
 if TYPE_CHECKING:
+    from src.models.address import UserAddress
     from src.models.coupon import Coupon
     from src.models.custom_request import CustomRequest
     from src.models.product import Product
@@ -41,6 +42,9 @@ class Order(Base):
     support_request_id: Mapped[int | None] = mapped_column(
         ForeignKey("custom_requests.id"), nullable=True
     )
+    shipping_address_id: Mapped[int | None] = mapped_column(
+        ForeignKey("user_addresses.id"), nullable=True
+    )
     payment_link: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), nullable=False
@@ -50,9 +54,14 @@ class Order(Base):
     user: Mapped["User"] = relationship("User", back_populates="orders")
     coupon: Mapped["Coupon | None"] = relationship("Coupon")
     support_request: Mapped["CustomRequest | None"] = relationship("CustomRequest")
+    shipping_address: Mapped["UserAddress | None"] = relationship("UserAddress")
     items: Mapped[list["OrderItem"]] = relationship(
         "OrderItem", back_populates="order", cascade="all, delete-orphan"
     )
+
+    @property
+    def shipping_address_text(self) -> str | None:
+        return self.shipping_address.full_address if self.shipping_address else None
 
 
 class OrderItem(Base):

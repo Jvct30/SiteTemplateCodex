@@ -12,6 +12,7 @@ export default function CustomRequestsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { requests, isLoading, createRequest } = useCustomRequests();
   const [isCreating, setIsCreating] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<"open" | "closed" | "cancelled">("open");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 
@@ -43,6 +44,12 @@ export default function CustomRequestsPage() {
     }
   };
 
+  const filteredRequests = requests?.filter((req) => {
+    if (statusFilter === "closed") return req.status === "closed";
+    if (statusFilter === "cancelled") return req.status === "cancelled";
+    return !["closed", "cancelled"].includes(req.status);
+  });
+
   return (
     <div className="max-w-4xl mx-auto w-full">
       <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -53,6 +60,27 @@ export default function CustomRequestsPage() {
         >
           <Plus className="w-5 h-5" /> Novo Pedido
         </button>
+      </div>
+
+      <div className="mb-6 flex flex-wrap gap-2">
+        {[
+          { value: "open", label: "Abertos" },
+          { value: "closed", label: "Finalizados" },
+          { value: "cancelled", label: "Cancelados" },
+        ].map((item) => (
+          <button
+            key={item.value}
+            type="button"
+            onClick={() => setStatusFilter(item.value as typeof statusFilter)}
+            className={`soft-button ${
+              statusFilter === item.value
+                ? "bg-lunart-purple-600 text-white"
+                : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"
+            }`}
+          >
+            {item.label}
+          </button>
+        ))}
       </div>
 
       {isCreating && (
@@ -85,13 +113,13 @@ export default function CustomRequestsPage() {
 
       {isLoading ? (
         <div className="text-center">Carregando...</div>
-      ) : requests?.length === 0 ? (
+      ) : filteredRequests?.length === 0 ? (
         <div className="text-center text-lunart-white/60 py-12 glass rounded-lg">
-          Você ainda não fez nenhum pedido customizado.
+          Nenhum pedido encontrado neste filtro.
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {requests?.map((req) => (
+          {filteredRequests?.map((req) => (
             <Link 
               href={`/custom-requests/${req.id}`} 
               key={req.id}

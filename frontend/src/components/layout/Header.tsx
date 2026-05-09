@@ -6,6 +6,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { LogOut, Menu, ShoppingCart, User, X } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const navItems = [
   { href: "/", label: "Produtos" },
@@ -42,6 +43,14 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-lunart-white/10 bg-lunart-bg/85 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2" onClick={closeMenu}>
+          <Image
+            src="/lunart-logo.png"
+            alt="Lunart"
+            width={34}
+            height={34}
+            className="rounded-full"
+            priority
+          />
           <span className="text-2xl font-display font-bold text-transparent bg-clip-text bg-lunart-gradient">
             Lunart
           </span>

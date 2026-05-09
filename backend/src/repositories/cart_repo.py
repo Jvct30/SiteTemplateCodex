@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from src.models.cart import Cart, CartItem
+from src.models.user import User
 from src.repositories.interfaces.i_cart_repo import ICartRepository
 
 
@@ -17,7 +18,7 @@ class CartRepository(ICartRepository):
             select(Cart)
             .where(Cart.user_id == user_id)
             .options(
-                joinedload(Cart.user),
+                joinedload(Cart.user).joinedload(User.addresses),
                 joinedload(Cart.items).joinedload(CartItem.product),
             )
         )

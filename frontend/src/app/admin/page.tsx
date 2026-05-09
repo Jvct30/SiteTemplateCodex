@@ -6,18 +6,27 @@ import api, { getApiErrorMessage } from "@/lib/api";
 import toast from "react-hot-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomRequests } from "@/hooks/useCustomRequests";
-import { useQueryClient } from "@tanstack/react-query";
-import { Megaphone, MessageSquare, PackagePlus, Trash2 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Megaphone, MessageSquare, PackageCheck, PackagePlus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { formatMoney } from "@/lib/formatters";
 import { formatDateTime } from "@/lib/dates";
+import { OrderResponse } from "@/types";
 
 export default function AdminPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { products } = useProducts();
   const { requests, isLoading: requestsLoading } = useCustomRequests();
+  const { data: orders, isLoading: ordersLoading } = useQuery({
+    queryKey: ["admin-orders"],
+    queryFn: async () => {
+      const res = await api.get<OrderResponse[]>("/admin/orders");
+      return res.data;
+    },
+    enabled: isAuthenticated && user?.role === "admin",
+  });
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"products" | "customRequests">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "customRequests" | "paidOrders">("products");
   
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("");
@@ -130,6 +139,14 @@ export default function AdminPage() {
           <MessageSquare className="h-4 w-4" />
           Ver pedidos sob encomenda
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("paidOrders")}
+          className={`soft-button gap-2 ${activeTab === "paidOrders" ? "bg-lunart-purple-600 text-white" : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"}`}
+        >
+          <PackageCheck className="h-4 w-4" />
+          Pedidos pagos
+        </button>
       </div>
 
       {activeTab === "products" ? (
@@ -211,7 +228,7 @@ export default function AdminPage() {
         </div>
 
       </div>
-      ) : (
+      ) : activeTab === "customRequests" ? (
         <div className="glass rounded-lg p-6">
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
             <MessageSquare className="h-5 w-5 text-lunart-pink-300" />
@@ -244,6 +261,43 @@ export default function AdminPage() {
             </div>
           ) : (
             <p className="text-sm text-lunart-white/60">Nenhum pedido sob encomenda encontrado.</p>
+          )}
+        </div>
+      ) : (
+        <div className="glass rounded-lg p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+            <PackageCheck className="h-5 w-5 text-lunart-pink-300" />
+            Pedidos pagos para envio
+          </h2>
+
+          {ordersLoading ? (
+            <p className="text-sm text-lunart-white/60">Carregando pedidos...</p>
+          ) : orders?.filter((order) => order.status === "paid").length ? (
+            <div className="flex flex-col gap-3">
+              {orders
+                .filter((order) => order.status === "paid")
+                .map((order) => (
+                  <div
+                    key={order.id}
+                    className="rounded-lg border border-lunart-white/10 bg-lunart-surface-light p-4 transition-colors hover:border-lunart-pink-300"
+                  >
+                    <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <h3 className="font-semibold">Pedido #{order.id}</h3>
+                          <p className="text-xs text-lunart-white/45">{formatDateTime(order.created_at)}</p>
+                        </div>
+                        <span className="text-lg font-bold text-lunart-pink-300">{formatMoney(order.total)}</span>
+                      </div>
+                      <div className="text-sm text-lunart-white/65">
+                        {order.shipping_address_text || "Retirada na loja"}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <p className="text-sm text-lunart-white/60">Nenhum pedido pago aguardando envio.</p>
           )}
         </div>
       )}

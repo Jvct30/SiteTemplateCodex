@@ -16,6 +16,8 @@ class UserService:
     async def create_user(self, data: UserCreate) -> User:
         if await self.user_repo.get_by_username(data.username):
             raise ConflictException("Username já está em uso")
+        if await self.user_repo.get_by_email(data.email.strip().lower()):
+            raise ConflictException("Email já está em uso")
         if await self.user_repo.get_by_cpf(data.cpf):
             raise ConflictException("CPF já cadastrado")
 

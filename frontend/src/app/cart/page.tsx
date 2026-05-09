@@ -10,16 +10,21 @@ import { useState } from "react";
 import api, { getApiErrorMessage } from "@/lib/api";
 import toast from "react-hot-toast";
 import { formatMoney, toCurrencyNumber } from "@/lib/formatters";
+import { useAddresses } from "@/hooks/useAddresses";
 
 export default function CartPage() {
   const { cart, isLoading, updateQuantity, removeItem } = useCart();
   const { checkout, isPending } = useCheckout();
+  const { addresses } = useAddresses();
   const router = useRouter();
   
   const [shippingMethod, setShippingMethod] = useState("mercado_envios");
   const [couponCode, setCouponCode] = useState("");
   const [shippingCost, setShippingCost] = useState(25.90);
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  const defaultAddressId = addresses?.find((address) => address.is_default)?.id ?? addresses?.[0]?.id ?? null;
+  const checkoutAddressId = selectedAddressId ?? defaultAddressId;
 
   const calculateShipping = async (method: string) => {
     setShippingMethod(method);
@@ -51,7 +56,8 @@ export default function CartPage() {
     try {
       const order = await checkout({ 
         shipping_method: shippingMethod, 
-        coupon_code: couponCode || undefined 
+        coupon_code: couponCode || undefined,
+        address_id: shippingMethod === "pickup" ? undefined : checkoutAddressId || undefined,
       });
       if (order.payment_link && typeof window !== "undefined") {
         const paymentTab = window.open(order.payment_link, "_blank", "noopener,noreferrer");
@@ -123,6 +129,7 @@ export default function CartPage() {
               <Trash2 className="w-5 h-5" />
             </button>
           </div>
+
         ))}
       </div>
 
@@ -151,6 +158,29 @@ export default function CartPage() {
             <span>Frete</span>
             <span>{formatMoney(shipping)}</span>
           </div>
+
+          {shippingMethod !== "pickup" && (
+            <div className="pt-4 border-t border-lunart-white/10">
+              <label className="block text-sm mb-2 text-lunart-white/80">Endereço de entrega</label>
+              {addresses?.length ? (
+                <select
+                  value={checkoutAddressId ?? ""}
+                  onChange={(e) => setSelectedAddressId(Number(e.target.value))}
+                  className="form-field"
+                >
+                  {addresses.map((address) => (
+                    <option key={address.id} value={address.id}>
+                      {address.label} - {address.city}/{address.state}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <Link href="/profile" className="soft-button w-full bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">
+                  Criar endereço no perfil
+                </Link>
+              )}
+            </div>
+          )}
 
           <div className="pt-4 border-t border-lunart-white/10">
             <label className="block text-sm mb-2 text-lunart-white/80">Cupom de Desconto</label>
@@ -190,7 +220,7 @@ export default function CartPage() {
 
         <button 
           onClick={handleCheckout}
-          disabled={isPending}
+          disabled={isPending || (shippingMethod !== "pickup" && !checkoutAddressId)}
           className="soft-button w-full bg-lunart-pink-500 py-4 text-lg text-white hover:bg-lunart-pink-400"
         >
           {isPending ? "Processando..." : "Finalizar Compra"}

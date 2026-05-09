@@ -5,6 +5,7 @@ from src.core.exceptions import (
     ConflictException,
     NotFoundException,
 )
+from src.models.address import UserAddress
 from src.models.order import Order
 from src.repositories.interfaces.i_cart_repo import ICartRepository
 from src.repositories.interfaces.i_coupon_repo import ICouponRepository
@@ -110,6 +111,17 @@ class OrderService:
         if not cart or not cart.items:
             raise BadRequestException("O carrinho está vazio")
 
+        shipping_address: UserAddress | None = None
+        if data.shipping_method != "pickup":
+            if not data.address_id:
+                raise BadRequestException("Cadastre e selecione um endereço para entrega")
+            for address in cart.user.addresses:
+                if address.id == data.address_id:
+                    shipping_address = address
+                    break
+            if not shipping_address:
+                raise BadRequestException("Endereço de entrega inválido")
+
         # 1. Check stock without decrementing. Stock leaves the store only after payment.
         subtotal = Decimal("0.00")
         items_to_buy = []
@@ -159,6 +171,7 @@ class OrderService:
             discount=discount,
             total=total,
             coupon_id=coupon_id,
+            shipping_address_id=shipping_address.id if shipping_address else None,
         )
 
         # 6. Add Order Items
@@ -175,16 +188,11 @@ class OrderService:
         await self.cart_repo.clear(cart.id)
 
         # 8. Open order support chat without showing it in the custom-order list
-        user = cart.user
         item_lines = [
             f"- {item['product_name']}: {item['quantity']} unidade(s)"
             for item in items_to_buy
         ]
-        address = (
-            f"{user.address_street}, {user.address_number}"
-            f" - {user.address_neighborhood}, {user.address_city}/{user.address_state}"
-            f" - CEP {user.address_zip}"
-        )
+        address = shipping_address.full_address if shipping_address else "Retirada na loja"
         subject = f"Acompanhamento do Pedido #{order.id}"
         msg = (
             f"Olá! Seu pedido #{order.id} foi criado com sucesso.\n\n"

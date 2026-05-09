@@ -6,7 +6,7 @@ export function Footer() {
           Lunart
         </h2>
         <p className="text-sm text-lunart-white/55">
-          Peças autorais, presentes afetivos e encomendas feitas com cuidado.
+          Peças feitas a mão com carinho para presentear e decorar o ambiente
         </p>
         <div className="text-xs text-lunart-white/35">
           &copy; {new Date().getFullYear()} Lunart E-commerce. Todos os direitos reservados.

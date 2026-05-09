@@ -3,49 +3,35 @@
 import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import api, { getApiErrorMessage, getApiValidationErrors } from "@/lib/api";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 
 type RegisterField =
   | "fullName"
   | "username"
+  | "email"
   | "password"
   | "cpf"
-  | "birthDate"
-  | "street"
-  | "number"
-  | "neighborhood"
-  | "city"
-  | "state"
-  | "zip";
+  | "birthDate";
 
 const backendFieldMap: Record<string, RegisterField> = {
   full_name: "fullName",
   username: "username",
+  email: "email",
   password: "password",
   cpf: "cpf",
   birth_date: "birthDate",
-  address_street: "street",
-  address_number: "number",
-  address_neighborhood: "neighborhood",
-  address_city: "city",
-  address_state: "state",
-  address_zip: "zip",
 };
 
 const registerFieldLabels: Record<RegisterField, string> = {
   fullName: "Nome completo",
   username: "Username",
+  email: "Email",
   password: "Senha",
   cpf: "CPF",
   birthDate: "Data de nascimento",
-  street: "Rua",
-  number: "Número",
-  neighborhood: "Bairro",
-  city: "Cidade",
-  state: "Estado",
-  zip: "CEP",
 };
 
 const onlyDigits = (value: string) => value.replace(/\D/g, "");
@@ -90,8 +76,9 @@ const parseBirthDate = (value: string) => {
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isLogin = searchParams.get("mode") !== "register";
   
-  const [isLogin, setIsLogin] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [registerErrors, setRegisterErrors] = useState<Partial<Record<RegisterField, string>>>({});
@@ -102,15 +89,9 @@ export default function LoginPage() {
   
   // Register State
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [street, setStreet] = useState("");
-  const [number, setNumber] = useState("");
-  const [complement, setComplement] = useState("");
-  const [neighborhood, setNeighborhood] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zip, setZip] = useState("");
 
   const clearRegisterError = (field: RegisterField) => {
     setRegisterErrors((current) => {
@@ -145,6 +126,9 @@ export default function LoginPage() {
     const message = getApiErrorMessage(error, "Erro ao realizar cadastro");
     if (message.toLowerCase().includes("username")) {
       nextErrors.username = message;
+    }
+    if (message.toLowerCase().includes("email")) {
+      nextErrors.email = message;
     }
     if (message.toLowerCase().includes("cpf")) {
       nextErrors.cpf = message;
@@ -191,16 +175,10 @@ export default function LoginPage() {
       await api.post("/auth/register", {
         full_name: fullName.trim(),
         username: username.trim(),
+        email: email.trim().toLowerCase(),
         password,
         cpf: cpfDigits,
         birth_date: parsedBirthDate,
-        address_street: street.trim(),
-        address_number: number.trim(),
-        address_complement: complement || null,
-        address_neighborhood: neighborhood.trim(),
-        address_city: city.trim(),
-        address_state: state.trim().toUpperCase(),
-        address_zip: zip.trim()
       });
       const res = await api.post("/auth/login", { username: username.trim(), password });
       await login(res.data.access_token);
@@ -228,7 +206,7 @@ export default function LoginPage() {
       <p className="mb-8 text-center text-sm text-lunart-white/55">
         {isLogin
           ? "Acesse sua conta para acompanhar pedidos e salvar suas peças favoritas."
-          : "Complete seus dados para comprar com frete e encomendas sem retrabalho."}
+          : "Complete seu cadastro; o endereço pode ser criado depois no perfil."}
       </p>
 
       {isLogin ? (
@@ -262,9 +240,9 @@ export default function LoginPage() {
           </button>
         </form>
       ) : (
-        <form onSubmit={handleRegister} className="flex max-h-[68vh] flex-col gap-4 overflow-y-auto px-1 custom-scrollbar">
+        <form onSubmit={handleRegister} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Nome Completo</label>
+            <label className="block text-sm font-medium mb-1">Nome</label>
             <input type="text" required value={fullName} onChange={e => { setFullName(e.target.value); clearRegisterError("fullName"); }} className={registerInputClass("fullName")} />
             {renderFieldError("fullName")}
           </div>
@@ -274,6 +252,19 @@ export default function LoginPage() {
               <input type="text" required value={username} onChange={e => { setUsername(e.target.value); clearRegisterError("username"); }} className={registerInputClass("username")} />
               {renderFieldError("username")}
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={e => { setEmail(e.target.value); clearRegisterError("email"); }}
+                className={registerInputClass("email")}
+              />
+              {renderFieldError("email")}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium mb-1">Senha</label>
               <div className="relative">
@@ -295,8 +286,6 @@ export default function LoginPage() {
               </div>
               {renderFieldError("password")}
             </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium mb-1">CPF</label>
               <input
@@ -310,61 +299,19 @@ export default function LoginPage() {
               />
               {renderFieldError("cpf")}
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Data Nascimento</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                required
-                value={birthDate}
-                onChange={(e) => { setBirthDate(formatBirthDate(e.target.value)); clearRegisterError("birthDate"); }}
-                placeholder="dd/mm/aaaa"
-                className={registerInputClass("birthDate")}
-              />
-              {renderFieldError("birthDate")}
-            </div>
           </div>
-          
-          <h3 className="font-semibold text-lunart-pink-300 mt-2">Endereço</h3>
           <div>
-            <label className="block text-sm font-medium mb-1">Rua</label>
-            <input type="text" required value={street} onChange={e => { setStreet(e.target.value); clearRegisterError("street"); }} className={registerInputClass("street")} />
-            {renderFieldError("street")}
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-1">
-              <label className="block text-sm font-medium mb-1">Número</label>
-              <input type="text" required value={number} onChange={e => { setNumber(e.target.value); clearRegisterError("number"); }} className={registerInputClass("number")} />
-              {renderFieldError("number")}
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium mb-1">Complemento</label>
-              <input type="text" value={complement} onChange={e => setComplement(e.target.value)} className="form-field" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium mb-1">Bairro</label>
-              <input type="text" required value={neighborhood} onChange={e => { setNeighborhood(e.target.value); clearRegisterError("neighborhood"); }} className={registerInputClass("neighborhood")} />
-              {renderFieldError("neighborhood")}
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Cidade</label>
-              <input type="text" required value={city} onChange={e => { setCity(e.target.value); clearRegisterError("city"); }} className={registerInputClass("city")} />
-              {renderFieldError("city")}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium mb-1">Estado (UF)</label>
-              <input type="text" maxLength={2} required value={state} onChange={e => { setState(e.target.value.toUpperCase()); clearRegisterError("state"); }} className={`${registerInputClass("state")} uppercase`} />
-              {renderFieldError("state")}
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">CEP</label>
-              <input type="text" required value={zip} onChange={e => { setZip(e.target.value); clearRegisterError("zip"); }} className={registerInputClass("zip")} />
-              {renderFieldError("zip")}
-            </div>
+            <label className="block text-sm font-medium mb-1">Data de nascimento</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              required
+              value={birthDate}
+              onChange={(e) => { setBirthDate(formatBirthDate(e.target.value)); clearRegisterError("birthDate"); }}
+              placeholder="dd/mm/aaaa"
+              className={registerInputClass("birthDate")}
+            />
+            {renderFieldError("birthDate")}
           </div>
           
           <button
@@ -379,12 +326,12 @@ export default function LoginPage() {
 
       <div className="mt-6 text-center text-sm text-lunart-white/60">
         {isLogin ? "Não possui uma conta?" : "Já possui uma conta?"}{" "}
-        <button 
-          onClick={() => setIsLogin(!isLogin)}
-          className="text-lunart-pink-400 hover:text-lunart-pink-300 font-medium"
+        <Link
+          href={isLogin ? "/login?mode=register" : "/login"}
+          className="font-medium text-lunart-pink-400 hover:text-lunart-pink-300"
         >
           {isLogin ? "Cadastre-se" : "Faça Login"}
-        </button>
+        </Link>
       </div>
     </div>
   );

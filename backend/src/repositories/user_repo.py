@@ -25,20 +25,26 @@ class UserRepository(IUserRepository):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_email(self, email: str) -> User | None:
+        stmt = select(User).where(User.email == email)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def create(self, data: UserCreate, hashed_password: str) -> User:
         user = User(
             full_name=data.full_name,
             username=data.username,
+            email=data.email.strip().lower(),
             password=hashed_password,
             cpf=data.cpf,
             birth_date=data.birth_date,
-            address_street=data.address_street,
-            address_number=data.address_number,
-            address_complement=data.address_complement,
-            address_neighborhood=data.address_neighborhood,
-            address_city=data.address_city,
-            address_state=data.address_state,
-            address_zip=data.address_zip,
+            address_street="",
+            address_number="",
+            address_complement=None,
+            address_neighborhood="",
+            address_city="",
+            address_state="",
+            address_zip="",
             role="customer",
             is_active=True,
         )

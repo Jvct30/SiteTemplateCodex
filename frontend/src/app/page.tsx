@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
-import { ArrowRight, PackageSearch, ShoppingCart, Sparkles } from "lucide-react";
+import { ArrowRight, PackageSearch, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api, { getApiErrorMessage } from "@/lib/api";
@@ -68,10 +68,6 @@ export default function Home() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-lunart-bg via-lunart-bg/70 to-lunart-bg/10" />
         <div className="relative z-10 flex min-h-[360px] max-w-2xl flex-col justify-center px-6 py-12 sm:min-h-[430px] sm:px-10">
-          <span className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-lunart-white/10 bg-lunart-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-lunart-pink-300">
-            <Sparkles className="h-3.5 w-3.5" />
-            Artesanato autoral
-          </span>
           <h1 className="font-display text-4xl font-bold leading-tight text-lunart-white sm:text-6xl">
             Lunart
           </h1>

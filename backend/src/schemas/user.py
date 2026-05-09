@@ -8,16 +8,10 @@ class UserCreate(BaseModel):
 
     full_name: str = Field(min_length=3, max_length=255)
     username: str = Field(min_length=3, max_length=100)
+    email: str = Field(min_length=5, max_length=255)
     password: str = Field(min_length=6)
     cpf: str = Field(min_length=11, max_length=14)
     birth_date: date
-    address_street: str = Field(max_length=255)
-    address_number: str = Field(max_length=20)
-    address_complement: str | None = None
-    address_neighborhood: str = Field(max_length=100)
-    address_city: str = Field(max_length=100)
-    address_state: str = Field(max_length=2, min_length=2)
-    address_zip: str = Field(max_length=9)
 
     @field_validator("cpf")
     @classmethod
@@ -33,13 +27,6 @@ class UserUpdate(BaseModel):
 
     full_name: str | None = Field(default=None, min_length=3, max_length=255)
     password: str | None = Field(default=None, min_length=6)
-    address_street: str | None = Field(default=None, max_length=255)
-    address_number: str | None = Field(default=None, max_length=20)
-    address_complement: str | None = None
-    address_neighborhood: str | None = Field(default=None, max_length=100)
-    address_city: str | None = Field(default=None, max_length=100)
-    address_state: str | None = Field(default=None, max_length=2, min_length=2)
-    address_zip: str | None = Field(default=None, max_length=9)
 
 
 class UserResponse(BaseModel):
@@ -50,15 +37,16 @@ class UserResponse(BaseModel):
     id: int
     full_name: str
     username: str
+    email: str | None = None
     cpf: str
     birth_date: date
-    address_street: str
-    address_number: str
-    address_complement: str | None
-    address_neighborhood: str
-    address_city: str
-    address_state: str
-    address_zip: str
+    address_street: str = ""
+    address_number: str = ""
+    address_complement: str | None = None
+    address_neighborhood: str = ""
+    address_city: str = ""
+    address_state: str = ""
+    address_zip: str = ""
     role: str
     is_active: bool
     created_at: datetime

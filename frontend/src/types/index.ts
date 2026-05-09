@@ -2,6 +2,7 @@ export interface UserResponse {
   id: number;
   full_name: string;
   username: string;
+  email: string | null;
   cpf: string;
   birth_date: string;
   address_street: string;
@@ -13,6 +14,22 @@ export interface UserResponse {
   address_zip: string;
   role: string;
   is_active: boolean;
+  created_at: string;
+}
+
+export interface AddressResponse {
+  id: number;
+  user_id: number;
+  label: string;
+  street: string;
+  number: string;
+  complement: string | null;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  is_default: boolean;
+  full_address: string;
   created_at: string;
 }
 
@@ -68,6 +85,8 @@ export interface OrderResponse {
   discount: number;
   total: number;
   support_request_id: number | null;
+  shipping_address_id: number | null;
+  shipping_address_text: string | null;
   payment_link: string | null;
   created_at: string;
   items: OrderItemResponse[];

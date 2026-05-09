@@ -17,6 +17,7 @@ class IOrderRepository(ABC):
         discount: Decimal,
         total: Decimal,
         coupon_id: int | None,
+        shipping_address_id: int | None = None,
     ) -> Order:
         pass
 

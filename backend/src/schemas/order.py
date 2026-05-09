@@ -23,6 +23,7 @@ class CheckoutRequest(BaseModel):
 
     shipping_method: str  # "sedex" | "pickup" | "uber_flash"
     coupon_code: str | None = None
+    address_id: int | None = None
 
 
 class OrderResponse(BaseModel):
@@ -39,6 +40,8 @@ class OrderResponse(BaseModel):
     discount: Decimal
     total: Decimal
     support_request_id: int | None = None
+    shipping_address_id: int | None = None
+    shipping_address_text: str | None = None
     payment_link: str | None
     created_at: datetime
     items: list[OrderItemResponse]

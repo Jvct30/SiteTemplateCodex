@@ -31,7 +31,7 @@ export function useCheckout() {
   const queryClient = useQueryClient();
 
   const checkoutMutation = useMutation({
-    mutationFn: async (data: { shipping_method: string; coupon_code?: string }) => {
+    mutationFn: async (data: { shipping_method: string; coupon_code?: string; address_id?: number }) => {
       const res = await api.post<OrderResponse>("/orders/checkout", data);
       return res.data;
     },

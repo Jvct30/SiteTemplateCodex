@@ -132,6 +132,11 @@ export default function OrderDetailsPage() {
               <div className="border-t border-lunart-white/10 pt-3 text-lunart-white/60">
                 Entrega: {shipping}
               </div>
+              {order.shipping_address_text && (
+                <div className="rounded-lg border border-lunart-white/10 bg-lunart-white/5 p-3 text-lunart-white/65">
+                  {order.shipping_address_text}
+                </div>
+              )}
             </div>
 
             {order.payment_link && order.status === "pending" && (

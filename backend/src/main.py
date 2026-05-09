@@ -16,6 +16,7 @@ from src.core.exceptions import (
     ForbiddenException,
     NotFoundException,
 )
+from src.models.address import UserAddress  # noqa: F401
 from src.models.base import Base
 from src.models.db import engine
 from src.routers import (
@@ -51,9 +52,13 @@ async def ensure_sqlite_columns(conn) -> None:
         },
         "orders": {
             "support_request_id": "INTEGER",
+            "shipping_address_id": "INTEGER",
         },
         "order_items": {
             "variation": "VARCHAR(100)",
+        },
+        "users": {
+            "email": "VARCHAR(255)",
         },
     }
 
@@ -72,6 +77,26 @@ async def ensure_sqlite_columns(conn) -> None:
             UPDATE custom_requests
             SET request_type = 'order_support'
             WHERE subject LIKE 'Acompanhamento do Pedido #%'
+            """
+        )
+    )
+    await conn.execute(
+        text(
+            """
+            INSERT INTO user_addresses (
+                user_id, label, street, number, complement, neighborhood,
+                city, state, zip_code, is_default
+            )
+            SELECT
+                users.id, 'Principal', users.address_street, users.address_number,
+                users.address_complement, users.address_neighborhood,
+                users.address_city, users.address_state, users.address_zip, 1
+            FROM users
+            WHERE users.address_street != ''
+              AND NOT EXISTS (
+                  SELECT 1 FROM user_addresses
+                  WHERE user_addresses.user_id = users.id
+              )
             """
         )
     )

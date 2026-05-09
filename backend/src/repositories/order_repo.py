@@ -23,6 +23,7 @@ class OrderRepository(IOrderRepository):
         discount: Decimal,
         total: Decimal,
         coupon_id: int | None,
+        shipping_address_id: int | None = None,
     ) -> Order:
         order = Order(
             user_id=user_id,
@@ -33,6 +34,7 @@ class OrderRepository(IOrderRepository):
             discount=discount,
             total=total,
             coupon_id=coupon_id,
+            shipping_address_id=shipping_address_id,
         )
         self.session.add(order)
         await self.session.flush()
@@ -61,7 +63,10 @@ class OrderRepository(IOrderRepository):
         stmt = (
             select(Order)
             .where(Order.id == order_id)
-            .options(joinedload(Order.items).joinedload(OrderItem.product))
+            .options(
+                joinedload(Order.shipping_address),
+                joinedload(Order.items).joinedload(OrderItem.product),
+            )
         )
         result = await self.session.execute(stmt)
         return result.unique().scalar_one_or_none()
@@ -71,7 +76,10 @@ class OrderRepository(IOrderRepository):
             select(Order)
             .where(Order.user_id == user_id)
             .order_by(Order.created_at.desc())
-            .options(joinedload(Order.items).joinedload(OrderItem.product))
+            .options(
+                joinedload(Order.shipping_address),
+                joinedload(Order.items).joinedload(OrderItem.product),
+            )
         )
         result = await self.session.execute(stmt)
         return list(result.unique().scalars().all())
@@ -82,7 +90,10 @@ class OrderRepository(IOrderRepository):
             .order_by(Order.created_at.desc())
             .offset(skip)
             .limit(limit)
-            .options(joinedload(Order.items).joinedload(OrderItem.product))
+            .options(
+                joinedload(Order.shipping_address),
+                joinedload(Order.items).joinedload(OrderItem.product),
+            )
         )
         result = await self.session.execute(stmt)
         return list(result.unique().scalars().all())

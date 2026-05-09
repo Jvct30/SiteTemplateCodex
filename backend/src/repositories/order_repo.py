@@ -65,7 +65,7 @@ class OrderRepository(IOrderRepository):
             select(Order)
             .where(Order.user_id == user_id)
             .order_by(Order.created_at.desc())
-            .options(joinedload(Order.items))
+            .options(joinedload(Order.items).joinedload(OrderItem.product))
         )
         result = await self.session.execute(stmt)
         return list(result.unique().scalars().all())
@@ -76,9 +76,19 @@ class OrderRepository(IOrderRepository):
             .order_by(Order.created_at.desc())
             .offset(skip)
             .limit(limit)
+            .options(joinedload(Order.items).joinedload(OrderItem.product))
         )
         result = await self.session.execute(stmt)
-        return list(result.scalars().all())
+        return list(result.unique().scalars().all())
+
+    async def set_support_request(self, order_id: int, request_id: int) -> Order | None:
+        order = await self.get_by_id(order_id)
+        if not order:
+            return None
+
+        order.support_request_id = request_id
+        await self.session.flush()
+        return order
 
     async def update_status(self, order_id: int, status: str) -> Order | None:
         order = await self.get_by_id(order_id)

@@ -51,6 +51,8 @@ export interface CartResponse {
 export interface OrderItemResponse {
   id: number;
   product_id: number;
+  product_name: string;
+  product_image_url: string | null;
   quantity: number;
   unit_price: number;
   variation?: string | null;
@@ -65,6 +67,7 @@ export interface OrderResponse {
   subtotal: number;
   discount: number;
   total: number;
+  support_request_id: number | null;
   payment_link: string | null;
   created_at: string;
   items: OrderItemResponse[];

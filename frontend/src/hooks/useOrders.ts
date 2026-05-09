@@ -14,6 +14,19 @@ export function useOrders() {
   return { orders, isLoading };
 }
 
+export function useOrder(id: number) {
+  const { data: order, isLoading } = useQuery({
+    queryKey: ["orders", id],
+    queryFn: async () => {
+      const res = await api.get<OrderResponse>(`/orders/${id}`);
+      return res.data;
+    },
+    enabled: !!id,
+  });
+
+  return { order, isLoading };
+}
+
 export function useCheckout() {
   const queryClient = useQueryClient();
 

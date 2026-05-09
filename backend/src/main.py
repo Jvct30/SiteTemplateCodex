@@ -48,6 +48,9 @@ async def ensure_sqlite_columns(conn) -> None:
         "custom_requests": {
             "quoted_product_id": "INTEGER",
         },
+        "orders": {
+            "support_request_id": "INTEGER",
+        },
     }
 
     for table_name, expected_columns in columns.items():

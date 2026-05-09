@@ -5,6 +5,7 @@ import { useCheckout } from "@/hooks/useOrders";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import api, { getApiErrorMessage } from "@/lib/api";
 import toast from "react-hot-toast";
@@ -13,6 +14,7 @@ import { formatMoney, toCurrencyNumber } from "@/lib/formatters";
 export default function CartPage() {
   const { cart, isLoading, updateQuantity, removeItem } = useCart();
   const { checkout, isPending } = useCheckout();
+  const router = useRouter();
   
   const [shippingMethod, setShippingMethod] = useState("mercado_envios");
   const [couponCode, setCouponCode] = useState("");
@@ -51,17 +53,14 @@ export default function CartPage() {
         shipping_method: shippingMethod, 
         coupon_code: couponCode || undefined 
       });
-      // Redirect to mock payment link
-      if (shippingMethod === "pickup") {
-        toast.success("Pedido gerado! Um chat foi criado na aba de Perfil para agendar a retirada.", { duration: 4000 });
-        setTimeout(() => {
-          if (order.payment_link) window.location.href = order.payment_link;
-        }, 4000);
-      } else {
-        if (order.payment_link) {
-          window.location.href = order.payment_link;
+      if (order.payment_link && typeof window !== "undefined") {
+        const paymentTab = window.open(order.payment_link, "_blank", "noopener,noreferrer");
+        if (!paymentTab) {
+          toast.error("Permita pop-ups para abrir a página de pagamento em outra aba.");
         }
       }
+      toast.success("Pedido criado! Você pode acompanhar tudo em Meus Pedidos.");
+      router.push(`/profile/orders/${order.id}`);
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Erro ao finalizar compra"));
     }

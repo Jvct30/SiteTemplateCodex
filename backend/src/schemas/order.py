@@ -11,6 +11,8 @@ class OrderItemResponse(BaseModel):
 
     id: int
     product_id: int
+    product_name: str
+    product_image_url: str | None = None
     quantity: int
     unit_price: Decimal
     variation: str | None = None
@@ -36,6 +38,7 @@ class OrderResponse(BaseModel):
     subtotal: Decimal
     discount: Decimal
     total: Decimal
+    support_request_id: int | None = None
     payment_link: str | None
     created_at: datetime
     items: list[OrderItemResponse]

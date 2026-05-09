@@ -9,6 +9,7 @@ from src.models.base import Base
 
 if TYPE_CHECKING:
     from src.models.coupon import Coupon
+    from src.models.custom_request import CustomRequest
     from src.models.product import Product
     from src.models.user import User
 
@@ -37,6 +38,9 @@ class Order(Base):
     coupon_id: Mapped[int | None] = mapped_column(
         ForeignKey("coupons.id"), nullable=True
     )
+    support_request_id: Mapped[int | None] = mapped_column(
+        ForeignKey("custom_requests.id"), nullable=True
+    )
     payment_link: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), nullable=False
@@ -45,6 +49,7 @@ class Order(Base):
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="orders")
     coupon: Mapped["Coupon | None"] = relationship("Coupon")
+    support_request: Mapped["CustomRequest | None"] = relationship("CustomRequest")
     items: Mapped[list["OrderItem"]] = relationship(
         "OrderItem", back_populates="order", cascade="all, delete-orphan"
     )
@@ -69,3 +74,11 @@ class OrderItem(Base):
     # Relationships
     order: Mapped["Order"] = relationship("Order", back_populates="items")
     product: Mapped["Product"] = relationship("Product", back_populates="order_items")
+
+    @property
+    def product_name(self) -> str:
+        return self.product.name if self.product else f"Produto #{self.product_id}"
+
+    @property
+    def product_image_url(self) -> str | None:
+        return self.product.image_url if self.product else None

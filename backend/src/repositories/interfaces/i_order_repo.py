@@ -39,5 +39,9 @@ class IOrderRepository(ABC):
         pass
 
     @abstractmethod
+    async def set_support_request(self, order_id: int, request_id: int) -> Order | None:
+        pass
+
+    @abstractmethod
     async def update_status(self, order_id: int, status: str) -> Order | None:
         pass

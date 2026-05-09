@@ -170,6 +170,7 @@ class OrderService:
         create_schema = CustomRequestCreate(subject=subject, message=msg)
         followup = await self.custom_request_service.create_request(user_id, create_schema)
         await self.custom_request_service.update_status(followup.id, "answered")
+        await self.order_repo.set_support_request(order.id, followup.id)
 
         # 10. Mock Payment Link
         order.payment_link = f"https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=mock_{order.id}"

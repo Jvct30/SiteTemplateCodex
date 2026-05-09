@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Package } from "lucide-react";
 import { useEffect } from "react";
 import { formatMoney } from "@/lib/formatters";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -64,7 +65,11 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-6">
             {orders?.map(order => (
-          <div key={order.id} className="glass rounded-lg p-6">
+              <Link
+                key={order.id}
+                href={`/profile/orders/${order.id}`}
+                className="glass block rounded-lg p-6 transition-colors hover:border-lunart-pink-300"
+              >
                 <div className="flex flex-wrap justify-between items-center mb-4 pb-4 border-b border-lunart-white/10">
                   <div>
                     <div className="font-bold">Pedido #{order.id}</div>
@@ -87,26 +92,16 @@ export default function ProfilePage() {
                         <span className="w-6 h-6 bg-lunart-purple-600 rounded flex items-center justify-center text-xs">
                           {item.quantity}x
                         </span>
-                        <span>Produto #{item.product_id} {item.variation && <span className="text-lunart-pink-400">({item.variation})</span>}</span>
+                        <span>{item.product_name} {item.variation && <span className="text-lunart-pink-400">({item.variation})</span>}</span>
                       </div>
                       <span className="text-lunart-white/60">{formatMoney(item.unit_price)}</span>
                     </div>
                   ))}
                 </div>
-
-                {order.payment_link && order.status === "pending" && (
-                  <div className="mt-6 pt-4 border-t border-lunart-white/10 text-right">
-                    <a 
-                      href={order.payment_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                          className="soft-button bg-green-600 px-6 py-2 text-white hover:bg-green-500"
-                    >
-                      Pagar Agora (Mercado Pago)
-                    </a>
-                  </div>
-                )}
-              </div>
+                <div className="mt-5 border-t border-lunart-white/10 pt-4 text-right text-sm font-semibold text-lunart-pink-300">
+                  Ver detalhes e suporte
+                </div>
+              </Link>
             ))}
           </div>
         )}

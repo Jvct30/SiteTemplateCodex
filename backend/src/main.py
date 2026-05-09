@@ -19,6 +19,7 @@ from src.core.exceptions import (
 from src.models.address import UserAddress  # noqa: F401
 from src.models.base import Base
 from src.models.db import engine
+from src.models.review import Review  # noqa: F401
 from src.routers import (
     admin_router,
     auth_router,
@@ -28,6 +29,7 @@ from src.routers import (
     message_router,
     order_router,
     product_router,
+    review_router,
     shipping_router,
     store_router,
     user_router,
@@ -45,6 +47,7 @@ async def ensure_sqlite_columns(conn) -> None:
             "is_private": "BOOLEAN NOT NULL DEFAULT 0",
             "owner_user_id": "INTEGER",
             "custom_request_id": "INTEGER",
+            "image_urls": "JSON",
         },
         "custom_requests": {
             "quoted_product_id": "INTEGER",
@@ -71,6 +74,17 @@ async def ensure_sqlite_columns(conn) -> None:
                     text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_sql}")
                 )
 
+    await conn.execute(
+        text(
+            """
+            UPDATE products
+            SET image_urls = json_array(image_url)
+            WHERE image_url IS NOT NULL
+              AND image_url != ''
+              AND image_urls IS NULL
+            """
+        )
+    )
     await conn.execute(
         text(
             """
@@ -155,7 +169,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled error: {exc}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Erro interno do servidor. Nossa equipe estelar já foi notificada."},
+        content={"detail": "Erro interno do servidor. Nossa equipe já foi notificada."},
     )
 
 @app.exception_handler(CredentialsException)
@@ -189,6 +203,7 @@ app.include_router(coupon_router.router)
 app.include_router(order_router.router)
 app.include_router(message_router.router)
 app.include_router(custom_request_router.router)
+app.include_router(review_router.router)
 app.include_router(admin_router.router)
 
 @app.get("/", tags=["health"])

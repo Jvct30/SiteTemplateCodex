@@ -4,15 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
-import { ArrowRight, PackageSearch, ShoppingCart } from "lucide-react";
+import { ArrowRight, PackageSearch, ShoppingCart, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api, { getApiErrorMessage } from "@/lib/api";
 import { triggerCartPulse, triggerStars } from "@/lib/confetti";
 import { formatMoney } from "@/lib/formatters";
+import { useReviews } from "@/hooks/useReviews";
 
 export default function Home() {
   const { products, isLoading } = useProducts();
+  const { reviews } = useReviews();
   const { addToCart } = useCart();
   const [addingId, setAddingId] = useState<number | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -134,7 +136,7 @@ export default function Home() {
                 <Link href={`/products/${product.id}`} className="block">
                   <div className="aspect-square relative overflow-hidden bg-lunart-surface-light">
                     <Image
-                      src={product.image_url || "/Lunart-Header.jpg"}
+                      src={product.image_urls?.[0] || product.image_url || "/Lunart-Header.jpg"}
                       alt={product.name}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -170,6 +172,58 @@ export default function Home() {
                 </div>
               </article>
             ))}
+          </div>
+        )}
+      </section>
+
+      <section className="scroll-mt-24">
+        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-lunart-pink-300">
+              Avaliações
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-semibold">
+              O que clientes estão dizendo
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-lunart-white/60">
+            Comentários de quem confirmou o recebimento do pedido.
+          </p>
+        </div>
+
+        {reviews?.length ? (
+          <div className="grid gap-4 md:grid-cols-3">
+            {reviews.map((review) => (
+              <article key={review.id} className="glass rounded-lg p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-lunart-purple-600 font-bold text-white">
+                    {review.user_icon}
+                  </div>
+                  <div>
+                    <div className="font-semibold">@{review.username}</div>
+                    <div className="flex gap-0.5 text-lunart-pink-300">
+                      {Array.from({ length: 5 }, (_, index) => (
+                        <Star
+                          key={index}
+                          className={`h-3.5 w-3.5 ${index < review.rating ? "fill-lunart-pink-300" : "opacity-35"}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-lunart-white/60">{review.ordered_items}</p>
+                <p className="mt-3 text-sm leading-6 text-lunart-white/80">{review.comment}</p>
+                {review.image_url && (
+                  <div className="relative mt-4 aspect-video overflow-hidden rounded-lg bg-lunart-surface-light">
+                    <Image src={review.image_url} alt={`Foto da avaliação de ${review.username}`} fill className="object-cover" />
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="glass rounded-lg p-8 text-center text-lunart-white/60">
+            As primeiras avaliações aparecerão aqui depois que os pedidos forem recebidos.
           </div>
         )}
       </section>

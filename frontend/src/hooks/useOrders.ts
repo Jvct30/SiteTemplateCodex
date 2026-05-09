@@ -15,6 +15,7 @@ export function useOrders() {
 }
 
 export function useOrder(id: number) {
+  const queryClient = useQueryClient();
   const { data: order, isLoading } = useQuery({
     queryKey: ["orders", id],
     queryFn: async () => {
@@ -24,7 +25,23 @@ export function useOrder(id: number) {
     enabled: !!id,
   });
 
-  return { order, isLoading };
+  const confirmReceivedMutation = useMutation({
+    mutationFn: async () => {
+      const res = await api.post<OrderResponse>(`/orders/${id}/confirm-received`);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders", id] });
+    },
+  });
+
+  return {
+    order,
+    isLoading,
+    confirmReceived: confirmReceivedMutation.mutateAsync,
+    isConfirmingReceived: confirmReceivedMutation.isPending,
+  };
 }
 
 export function useCheckout() {

@@ -35,12 +35,14 @@ class ProductRepository(IProductRepository):
         return list(result.scalars().all())
 
     async def create(self, data: ProductCreate) -> Product:
+        image_urls = data.image_urls or ([data.image_url] if data.image_url else None)
         product = Product(
             name=data.name,
             description=data.description,
             price=data.price,
             stock=data.stock,
-            image_url=data.image_url,
+            image_url=image_urls[0] if image_urls else None,
+            image_urls=image_urls,
             variations=data.variations,
             is_private=data.is_private,
             owner_user_id=data.owner_user_id,
@@ -57,6 +59,11 @@ class ProductRepository(IProductRepository):
             return None
 
         update_data = data.model_dump(exclude_unset=True)
+        if "image_urls" in update_data:
+            urls = update_data["image_urls"] or []
+            update_data["image_url"] = urls[0] if urls else None
+        elif "image_url" in update_data and update_data["image_url"]:
+            update_data["image_urls"] = [update_data["image_url"]]
         for key, value in update_data.items():
             setattr(product, key, value)
 

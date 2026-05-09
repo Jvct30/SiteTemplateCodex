@@ -32,24 +32,28 @@ export default function AdminPage() {
   const [productPrice, setProductPrice] = useState("");
   const [productStock, setProductStock] = useState("");
   const [productDesc, setProductDesc] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [variations, setVariations] = useState("");
   
   const [uploading, setUploading] = useState(false);
   const [noticeText, setNoticeText] = useState("");
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
     try {
       setUploading(true);
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await api.post("/admin/upload-image", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      setImageUrl(res.data.url);
-      toast.success("Imagem enviada com sucesso!");
+      const uploadedUrls: string[] = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await api.post("/admin/upload-image", formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+        uploadedUrls.push(res.data.url);
+      }
+      setImageUrls((current) => [...current, ...uploadedUrls]);
+      toast.success(files.length > 1 ? "Imagens enviadas com sucesso!" : "Imagem enviada com sucesso!");
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Erro ao enviar imagem."));
     } finally {
@@ -101,7 +105,8 @@ export default function AdminPage() {
         description: productDesc || null,
         price: parseFloat(productPrice),
         stock: parseInt(productStock, 10),
-        image_url: imageUrl || null,
+        image_url: imageUrls[0] || null,
+        image_urls: imageUrls.length ? imageUrls : null,
         variations: variations.trim()
           ? variations.split(",").map((v) => v.trim()).filter(Boolean)
           : null
@@ -112,7 +117,7 @@ export default function AdminPage() {
       setProductPrice("");
       setProductStock("");
       setProductDesc("");
-      setImageUrl("");
+      setImageUrls([]);
       setVariations("");
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Erro ao criar produto."));
@@ -174,9 +179,14 @@ export default function AdminPage() {
             </div>
             <div>
               <label className="block text-xs mb-1">Upload de Imagem</label>
-              <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="form-field file:mr-4 file:rounded-full file:border-0 file:bg-lunart-purple-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-lunart-purple-500" />
+              <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={uploading} className="form-field file:mr-4 file:rounded-full file:border-0 file:bg-lunart-purple-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-lunart-purple-500" />
               {uploading && <span className="text-xs text-lunart-pink-400 mt-1 block">Enviando...</span>}
-              {imageUrl && <span className="text-xs text-green-400 mt-1 block">Imagem enviada com sucesso!</span>}
+              {imageUrls.length > 0 && (
+                <div className="mt-2 flex flex-col gap-1 text-xs text-green-400">
+                  <span>{imageUrls.length > 1 ? "Imagens enviadas com sucesso!" : "Imagem enviada com sucesso!"}</span>
+                  <span className="text-lunart-white/45">A ordem das fotos segue a ordem dos uploads.</span>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-xs mb-1">Variações (Separadas por vírgula)</label>
@@ -199,7 +209,7 @@ export default function AdminPage() {
               Aviso da Loja
             </h2>
             <div className="flex flex-col gap-3">
-              <input type="text" value={noticeText} onChange={e=>setNoticeText(e.target.value)} className="form-field" placeholder="Ex: Estamos em promoção! Use o cupom ESTRELA" />
+              <input type="text" value={noticeText} onChange={e=>setNoticeText(e.target.value)} className="form-field" placeholder="Ex: Estamos em promoção! Use o cupom PROMO10" />
               <div className="flex gap-2">
                 <button onClick={handleSaveNotice} className="soft-button flex-1 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">Ativar</button>
                 <button onClick={handleRemoveNotice} className="soft-button flex-1 border border-red-500/50 bg-red-500/20 text-red-300 hover:bg-red-500/30">Remover</button>

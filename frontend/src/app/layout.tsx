@@ -13,9 +13,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "Lunart | Artesanato Autoral",
+  title: "Lunart",
   description:
-    "Peças artesanais autorais, presentes afetivos e encomendas personalizadas feitas pela Lunart.",
+    "Peças feitas a mão com carinho para presentear e decorar o ambiente.",
 };
 
 export default function RootLayout({

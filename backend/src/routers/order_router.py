@@ -44,3 +44,12 @@ async def get_order(
     order_service: OrderService = Depends(get_order_service)
 ):
     return await order_service.get_order(order_id, current_user.id)
+
+
+@router.post("/{order_id}/confirm-received", response_model=OrderResponse)
+async def confirm_received(
+    order_id: int,
+    current_user: User = Depends(get_current_user),
+    order_service: OrderService = Depends(get_order_service),
+):
+    return await order_service.confirm_received(order_id, current_user.id)

@@ -47,6 +47,18 @@ class OrderService:
             
         return order
 
+    async def confirm_received(self, order_id: int, user_id: int) -> Order:
+        order = await self.get_order(order_id, user_id)
+        if order.status not in {"paid", "shipped", "delivered"}:
+            raise BadRequestException("O pedido ainda não pode ser confirmado como recebido")
+        if order.status == "delivered":
+            return order
+
+        updated = await self.order_repo.update_status(order.id, "delivered")
+        if not updated:
+            raise NotFoundException("Pedido não encontrado")
+        return updated
+
     async def list_user_orders(self, user_id: int) -> list[Order]:
         return await self.order_repo.list_by_user(user_id)
 

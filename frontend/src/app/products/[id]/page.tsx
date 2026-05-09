@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { triggerCartPulse, triggerStars } from "@/lib/confetti";
-import { ArrowLeft, ShoppingCart, Star } from "lucide-react";
+import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { getApiErrorMessage } from "@/lib/api";
 import Link from "next/link";
 import { formatMoney } from "@/lib/formatters";
@@ -19,6 +19,7 @@ export default function ProductDetails() {
   const { addToCart } = useCart();
   const [adding, setAdding] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState<string>("");
+  const [selectedImage, setSelectedImage] = useState(0);
 
   if (isLoading) {
     return <div className="flex justify-center mt-20"><div className="w-12 h-12 rounded-full border-4 border-lunart-purple-500 border-t-transparent animate-spin"></div></div>;
@@ -29,6 +30,9 @@ export default function ProductDetails() {
   }
 
   const variations = product.variations ?? [];
+  const productImages = product.image_urls?.length
+    ? product.image_urls
+    : [product.image_url || "/Lunart-Header.jpg"];
   const activeVariation =
     selectedVariation && variations.includes(selectedVariation)
       ? selectedVariation
@@ -64,27 +68,38 @@ export default function ProductDetails() {
       </Link>
 
       <div className="grid grid-cols-1 gap-10 rounded-lg glass p-5 animate-slide-up md:grid-cols-2 md:p-8">
-        <div className="relative aspect-square overflow-hidden rounded-lg border border-lunart-white/10 bg-lunart-surface-light">
-          <Image
-            src={product.image_url || "/Lunart-Header.jpg"}
-            alt={product.name}
-            fill
-            className="object-cover"
-          />
+        <div>
+          <div className="relative aspect-square overflow-hidden rounded-lg border border-lunart-white/10 bg-lunart-surface-light">
+            <Image
+              src={productImages[selectedImage] || productImages[0]}
+              alt={product.name}
+              fill
+              className="object-cover"
+            />
+          </div>
+          {productImages.length > 1 && (
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+              {productImages.map((image, index) => (
+                <button
+                  key={`${image}-${index}`}
+                  type="button"
+                  onClick={() => setSelectedImage(index)}
+                  className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border ${
+                    selectedImage === index ? "border-lunart-pink-300" : "border-lunart-white/10"
+                  }`}
+                  aria-label={`Ver foto ${index + 1}`}
+                >
+                  <Image src={image} alt={`${product.name} foto ${index + 1}`} fill className="object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col">
-          <div className="flex items-center gap-2 mb-2 text-lunart-star">
-            <Star className="w-5 h-5 fill-lunart-star" />
-            <Star className="w-5 h-5 fill-lunart-star" />
-            <Star className="w-5 h-5 fill-lunart-star" />
-            <Star className="w-5 h-5 fill-lunart-star" />
-            <Star className="w-5 h-5 fill-lunart-star" />
-          </div>
-          
           <h1 className="text-4xl font-display font-bold mb-4">{product.name}</h1>
           <p className="text-lunart-white/80 text-lg mb-8 leading-relaxed">
-            {product.description || "Esta é uma peça única, feita com muito amor e poeira estelar."}
+            {product.description || "Esta é uma peça única, feita com muito amor e cuidado."}
           </p>
 
           {variations.length > 0 && (

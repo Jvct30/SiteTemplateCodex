@@ -73,14 +73,14 @@ export default function CartPage() {
   };
 
   if (isLoading) {
-    return <div className="text-center mt-20">Carregando constelações...</div>;
+    return <div className="text-center mt-20">Carregando produtos...</div>;
   }
 
   if (!cart || cart.items.length === 0) {
     return (
       <div className="text-center mt-20 glass p-12 max-w-lg mx-auto rounded-lg">
         <h2 className="text-3xl font-display font-bold mb-4">Carrinho Vazio</h2>
-        <p className="text-lunart-white/60 mb-8">Parece que você ainda não escolheu nenhuma estrela para a sua coleção.</p>
+        <p className="text-lunart-white/60 mb-8">Parece que você ainda não escolheu nenhum produto.</p>
         <Link href="/" className="soft-button bg-lunart-purple-600 px-8 py-3 text-white hover:bg-lunart-purple-500">
           Explorar Loja
         </Link>

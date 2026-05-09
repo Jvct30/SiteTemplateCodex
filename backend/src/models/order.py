@@ -90,4 +90,8 @@ class OrderItem(Base):
 
     @property
     def product_image_url(self) -> str | None:
-        return self.product.image_url if self.product else None
+        if not self.product:
+            return None
+        if self.product.image_urls:
+            return self.product.image_urls[0]
+        return self.product.image_url

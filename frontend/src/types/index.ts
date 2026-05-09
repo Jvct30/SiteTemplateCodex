@@ -40,6 +40,7 @@ export interface ProductResponse {
   price: number;
   stock: number;
   image_url: string | null;
+  image_urls?: string[] | null;
   is_active: boolean;
   is_private?: boolean;
   owner_user_id?: number | null;
@@ -90,6 +91,19 @@ export interface OrderResponse {
   payment_link: string | null;
   created_at: string;
   items: OrderItemResponse[];
+}
+
+export interface ReviewResponse {
+  id: number;
+  user_id: number;
+  order_id: number;
+  username: string;
+  user_icon: string;
+  ordered_items: string;
+  rating: number;
+  comment: string;
+  image_url: string | null;
+  created_at: string;
 }
 
 export interface CouponResponse {

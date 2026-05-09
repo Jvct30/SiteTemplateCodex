@@ -3,12 +3,14 @@
 import { useAuth } from "@/providers/auth-provider";
 import { useOrder } from "@/hooks/useOrders";
 import { formatMoney } from "@/lib/formatters";
-import { ArrowLeft, CreditCard, MessageCircle, PackageCheck } from "lucide-react";
+import { ArrowLeft, CreditCard, MessageCircle, PackageCheck, Star } from "lucide-react";
+import { useCreateReview } from "@/hooks/useReviews";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { formatDateTime } from "@/lib/dates";
+import toast from "react-hot-toast";
 
 const statusLabels: Record<string, string> = {
   pending: "Aguardando pagamento",
@@ -28,7 +30,11 @@ export default function OrderDetailsPage() {
   const router = useRouter();
   const id = Number(params.id);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { order, isLoading } = useOrder(id);
+  const { order, isLoading, confirmReceived, isConfirmingReceived } = useOrder(id);
+  const { createReview, isCreatingReview } = useCreateReview(id);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [reviewFile, setReviewFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -46,6 +52,35 @@ export default function OrderDetailsPage() {
 
   const status = statusLabels[order.status] ?? order.status;
   const shipping = shippingLabels[order.shipping_method] ?? order.shipping_method;
+  const canConfirmReceived = ["paid", "shipped"].includes(order.status);
+  const canReview = order.status === "delivered";
+
+  const handleConfirmReceived = async () => {
+    try {
+      await confirmReceived();
+      toast.success("Recebimento confirmado.");
+    } catch {
+      toast.error("Não foi possível confirmar o recebimento.");
+    }
+  };
+
+  const handleCreateReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!comment.trim()) {
+      toast.error("Escreva um comentário para avaliar.");
+      return;
+    }
+
+    try {
+      await createReview({ rating, comment, file: reviewFile });
+      setComment("");
+      setReviewFile(null);
+      setRating(5);
+      toast.success("Avaliação enviada.");
+    } catch {
+      toast.error("Não foi possível enviar a avaliação.");
+    }
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
@@ -150,7 +185,62 @@ export default function OrderDetailsPage() {
                 Pagar agora
               </a>
             )}
+            {canConfirmReceived && (
+              <button
+                type="button"
+                onClick={handleConfirmReceived}
+                disabled={isConfirmingReceived}
+                className="soft-button mt-3 w-full bg-lunart-pink-500 text-white hover:bg-lunart-pink-400"
+              >
+                {isConfirmingReceived ? "Confirmando..." : "Confirmar recebimento"}
+              </button>
+            )}
           </section>
+
+          {canReview && (
+            <section className="glass rounded-lg p-6">
+              <h2 className="mb-3 text-xl font-bold">Avaliar pedido</h2>
+              <form onSubmit={handleCreateReview} className="flex flex-col gap-3">
+                <div className="flex gap-1">
+                  {Array.from({ length: 5 }, (_, index) => {
+                    const value = index + 1;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setRating(value)}
+                        className="rounded-md p-1 text-lunart-pink-300 transition-colors hover:bg-lunart-white/10"
+                        aria-label={`${value} estrelas`}
+                      >
+                        <Star className={`h-6 w-6 ${value <= rating ? "fill-lunart-pink-300" : "opacity-35"}`} />
+                      </button>
+                    );
+                  })}
+                </div>
+                <textarea
+                  required
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="form-field"
+                  rows={4}
+                  placeholder="Conte como foi receber seu pedido"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setReviewFile(e.target.files?.[0] ?? null)}
+                  className="form-field file:mr-4 file:rounded-full file:border-0 file:bg-lunart-purple-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-lunart-purple-500"
+                />
+                <button
+                  type="submit"
+                  disabled={isCreatingReview}
+                  className="soft-button bg-lunart-purple-600 text-white hover:bg-lunart-purple-500"
+                >
+                  {isCreatingReview ? "Enviando..." : "Enviar avaliação"}
+                </button>
+              </form>
+            </section>
+          )}
 
           <section className="glass rounded-lg p-6">
             <h2 className="mb-3 flex items-center gap-2 text-xl font-bold">

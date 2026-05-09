@@ -23,6 +23,7 @@ class Product(Base):
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     stock: Mapped[int] = mapped_column(default=0, nullable=False)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    image_urls: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_private: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     owner_user_id: Mapped[int | None] = mapped_column(

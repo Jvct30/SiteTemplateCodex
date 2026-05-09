@@ -12,6 +12,7 @@ class ProductCreate(BaseModel):
     price: Decimal = Field(gt=0)
     stock: int = Field(ge=0)
     image_url: str | None = None
+    image_urls: list[str] | None = None
     variations: list[str] | None = None
     is_private: bool = False
     owner_user_id: int | None = None
@@ -26,6 +27,7 @@ class ProductUpdate(BaseModel):
     price: Decimal | None = Field(default=None, gt=0)
     stock: int | None = Field(default=None, ge=0)
     image_url: str | None = None
+    image_urls: list[str] | None = None
     is_active: bool | None = None
     variations: list[str] | None = None
     is_private: bool | None = None
@@ -44,6 +46,7 @@ class ProductResponse(BaseModel):
     price: Decimal
     stock: int
     image_url: str | None
+    image_urls: list[str] | None = None
     is_active: bool
     is_private: bool = False
     owner_user_id: int | None = None

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import api, { getApiErrorMessage, getApiValidationErrors } from "@/lib/api";
 import Link from "next/link";
@@ -73,7 +73,7 @@ const parseBirthDate = (value: string) => {
   return `${digits.slice(4, 8)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
 };
 
-export default function LoginPage() {
+function LoginPageContent() {
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -347,5 +347,13 @@ export default function LoginPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="mt-20 text-center">Carregando...</div>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

@@ -2,12 +2,53 @@
 
 import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
-import api, { getApiErrorMessage } from "@/lib/api";
+import api, { getApiErrorMessage, getApiValidationErrors } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ptBR } from "date-fns/locale/pt-BR";
 import toast from "react-hot-toast";
+
+type RegisterField =
+  | "fullName"
+  | "username"
+  | "password"
+  | "cpf"
+  | "birthDate"
+  | "street"
+  | "number"
+  | "neighborhood"
+  | "city"
+  | "state"
+  | "zip";
+
+const backendFieldMap: Record<string, RegisterField> = {
+  full_name: "fullName",
+  username: "username",
+  password: "password",
+  cpf: "cpf",
+  birth_date: "birthDate",
+  address_street: "street",
+  address_number: "number",
+  address_neighborhood: "neighborhood",
+  address_city: "city",
+  address_state: "state",
+  address_zip: "zip",
+};
+
+const registerFieldLabels: Record<RegisterField, string> = {
+  fullName: "Nome completo",
+  username: "Username",
+  password: "Senha",
+  cpf: "CPF",
+  birthDate: "Data de nascimento",
+  street: "Rua",
+  number: "Número",
+  neighborhood: "Bairro",
+  city: "Cidade",
+  state: "Estado",
+  zip: "CEP",
+};
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -15,6 +56,7 @@ export default function LoginPage() {
   
   const [isLogin, setIsLogin] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registerErrors, setRegisterErrors] = useState<Partial<Record<RegisterField, string>>>({});
   
   // Login State
   const [username, setUsername] = useState("");
@@ -31,6 +73,47 @@ export default function LoginPage() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zip, setZip] = useState("");
+
+  const clearRegisterError = (field: RegisterField) => {
+    setRegisterErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const registerInputClass = (field: RegisterField) =>
+    registerErrors[field]
+      ? "form-field border-red-400/80 bg-red-500/10"
+      : "form-field";
+
+  const renderFieldError = (field: RegisterField) =>
+    registerErrors[field] ? (
+      <p className="mt-1 text-xs font-medium text-red-300">{registerErrors[field]}</p>
+    ) : null;
+
+  const mapRegisterErrors = (error: unknown) => {
+    const apiErrors = getApiValidationErrors(error);
+    const nextErrors: Partial<Record<RegisterField, string>> = {};
+
+    for (const [backendField, message] of Object.entries(apiErrors)) {
+      const field = backendFieldMap[backendField];
+      if (field) {
+        nextErrors[field] = message;
+      }
+    }
+
+    const message = getApiErrorMessage(error, "Erro ao realizar cadastro");
+    if (message.toLowerCase().includes("username")) {
+      nextErrors.username = message;
+    }
+    if (message.toLowerCase().includes("cpf")) {
+      nextErrors.cpf = message;
+    }
+
+    return { message, nextErrors };
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +137,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       setIsSubmitting(true);
+      setRegisterErrors({});
       await api.post("/auth/register", {
         full_name: fullName.trim(),
         username: username.trim(),
@@ -73,7 +157,14 @@ export default function LoginPage() {
       toast.success("Cadastro realizado com sucesso!");
       router.push("/");
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Erro ao realizar cadastro"));
+      const { message, nextErrors } = mapRegisterErrors(error);
+      setRegisterErrors(nextErrors);
+      const firstErrorField = Object.keys(nextErrors)[0] as RegisterField | undefined;
+      toast.error(
+        firstErrorField
+          ? `Revise o campo ${registerFieldLabels[firstErrorField]}.`
+          : message
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -124,47 +215,54 @@ export default function LoginPage() {
         <form onSubmit={handleRegister} className="flex max-h-[68vh] flex-col gap-4 overflow-y-auto px-1 custom-scrollbar">
           <div>
             <label className="block text-sm font-medium mb-1">Nome Completo</label>
-            <input type="text" required value={fullName} onChange={e => setFullName(e.target.value)} className="form-field" />
+            <input type="text" required value={fullName} onChange={e => { setFullName(e.target.value); clearRegisterError("fullName"); }} className={registerInputClass("fullName")} />
+            {renderFieldError("fullName")}
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium mb-1">Username</label>
-              <input type="text" required value={username} onChange={e => setUsername(e.target.value)} className="form-field" />
+              <input type="text" required value={username} onChange={e => { setUsername(e.target.value); clearRegisterError("username"); }} className={registerInputClass("username")} />
+              {renderFieldError("username")}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Senha</label>
-              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="form-field" />
+              <input type="password" required value={password} onChange={e => { setPassword(e.target.value); clearRegisterError("password"); }} className={registerInputClass("password")} />
+              {renderFieldError("password")}
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium mb-1">CPF</label>
-              <input type="text" required value={cpf} onChange={e => setCpf(e.target.value)} placeholder="000.000.000-00" className="form-field" />
+              <input type="text" required value={cpf} onChange={e => { setCpf(e.target.value); clearRegisterError("cpf"); }} placeholder="000.000.000-00" className={registerInputClass("cpf")} />
+              {renderFieldError("cpf")}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Data Nascimento</label>
               <DatePicker 
                 selected={birthDate} 
-                onChange={(date: Date | null) => setBirthDate(date)} 
+                onChange={(date: Date | null) => { setBirthDate(date); clearRegisterError("birthDate"); }} 
                 locale={ptBR}
                 dateFormat="dd/MM/yyyy"
                 placeholderText="dd/mm/aaaa"
-                className="form-field"
+                className={registerInputClass("birthDate")}
                 wrapperClassName="w-full"
                 required
               />
+              {renderFieldError("birthDate")}
             </div>
           </div>
           
           <h3 className="font-semibold text-lunart-pink-300 mt-2">Endereço</h3>
           <div>
             <label className="block text-sm font-medium mb-1">Rua</label>
-            <input type="text" required value={street} onChange={e => setStreet(e.target.value)} className="form-field" />
+            <input type="text" required value={street} onChange={e => { setStreet(e.target.value); clearRegisterError("street"); }} className={registerInputClass("street")} />
+            {renderFieldError("street")}
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-1">
               <label className="block text-sm font-medium mb-1">Número</label>
-              <input type="text" required value={number} onChange={e => setNumber(e.target.value)} className="form-field" />
+              <input type="text" required value={number} onChange={e => { setNumber(e.target.value); clearRegisterError("number"); }} className={registerInputClass("number")} />
+              {renderFieldError("number")}
             </div>
             <div className="col-span-2">
               <label className="block text-sm font-medium mb-1">Complemento</label>
@@ -174,21 +272,25 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium mb-1">Bairro</label>
-              <input type="text" required value={neighborhood} onChange={e => setNeighborhood(e.target.value)} className="form-field" />
+              <input type="text" required value={neighborhood} onChange={e => { setNeighborhood(e.target.value); clearRegisterError("neighborhood"); }} className={registerInputClass("neighborhood")} />
+              {renderFieldError("neighborhood")}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Cidade</label>
-              <input type="text" required value={city} onChange={e => setCity(e.target.value)} className="form-field" />
+              <input type="text" required value={city} onChange={e => { setCity(e.target.value); clearRegisterError("city"); }} className={registerInputClass("city")} />
+              {renderFieldError("city")}
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium mb-1">Estado (UF)</label>
-              <input type="text" maxLength={2} required value={state} onChange={e => setState(e.target.value.toUpperCase())} className="form-field uppercase" />
+              <input type="text" maxLength={2} required value={state} onChange={e => { setState(e.target.value.toUpperCase()); clearRegisterError("state"); }} className={`${registerInputClass("state")} uppercase`} />
+              {renderFieldError("state")}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">CEP</label>
-              <input type="text" required value={zip} onChange={e => setZip(e.target.value)} className="form-field" />
+              <input type="text" required value={zip} onChange={e => { setZip(e.target.value); clearRegisterError("zip"); }} className={registerInputClass("zip")} />
+              {renderFieldError("zip")}
             </div>
           </div>
           

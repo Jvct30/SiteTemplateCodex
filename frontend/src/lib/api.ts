@@ -10,9 +10,34 @@ export function getApiErrorMessage(error: unknown, fallback: string) {
     if (typeof detail === "string") {
       return detail;
     }
+    if (Array.isArray(detail) && typeof detail[0]?.msg === "string") {
+      return detail[0].msg;
+    }
   }
 
   return fallback;
+}
+
+export function getApiValidationErrors(error: unknown) {
+  const errors: Record<string, string> = {};
+
+  if (!axios.isAxiosError(error)) {
+    return errors;
+  }
+
+  const detail = error.response?.data?.detail;
+  if (!Array.isArray(detail)) {
+    return errors;
+  }
+
+  for (const item of detail) {
+    const field = Array.isArray(item?.loc) ? item.loc[item.loc.length - 1] : null;
+    if (typeof field === "string" && typeof item?.msg === "string") {
+      errors[field] = item.msg;
+    }
+  }
+
+  return errors;
 }
 
 api.interceptors.request.use((config) => {

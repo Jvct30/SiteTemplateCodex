@@ -4,25 +4,28 @@ import { useEffect, useState } from "react";
 
 interface Star {
   id: number;
-  x: number;
-  y: number;
-  size: number;
-  duration: number;
-  delay: number;
+  x: string;
+  y: string;
+  size: string;
+  parallax: number;
+  duration: string;
+  delay: string;
 }
 
 const stars: Star[] = Array.from({ length: 64 }, (_, i) => {
   const xSeed = Math.sin(i * 12.9898) * 43758.5453;
   const ySeed = Math.sin(i * 78.233) * 24634.6345;
   const sizeSeed = Math.sin(i * 39.425) * 9658.234;
+  const size = Math.abs(sizeSeed % 1.8) + 0.8;
 
   return {
     id: i,
-    x: Math.abs(xSeed % 100),
-    y: Math.abs(ySeed % 100),
-    size: Math.abs(sizeSeed % 1.8) + 0.8,
-    duration: Math.abs((xSeed + ySeed) % 3) + 2.5,
-    delay: Math.abs(sizeSeed % 2.5),
+    x: Math.abs(xSeed % 100).toFixed(4),
+    y: Math.abs(ySeed % 100).toFixed(4),
+    size: size.toFixed(4),
+    parallax: size / 3,
+    duration: (Math.abs((xSeed + ySeed) % 3) + 2.5).toFixed(4),
+    delay: Math.abs(sizeSeed % 2.5).toFixed(4),
   };
 });
 
@@ -54,9 +57,9 @@ export function StarField() {
             height: `${star.size}px`,
             animationDuration: `${star.duration}s`,
             animationDelay: `${star.delay}s`,
-            transform: `translate(${mousePos.x * (star.size / 3)}px, ${mousePos.y * (star.size / 3)}px)`,
-        }}
-      />
+            transform: `translate(${(mousePos.x * star.parallax).toFixed(4)}px, ${(mousePos.y * star.parallax).toFixed(4)}px)`,
+          }}
+        />
       ))}
     </div>
   );

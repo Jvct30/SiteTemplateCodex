@@ -20,6 +20,7 @@ from src.models.address import UserAddress  # noqa: F401
 from src.models.base import Base
 from src.models.db import engine
 from src.models.review import Review  # noqa: F401
+from src.models.store_link import StoreLink  # noqa: F401
 from src.routers import (
     admin_router,
     auth_router,

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { UserResponse } from "@/types";
 import api from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 interface AuthContextData {
   user: UserResponse | null;
@@ -15,6 +16,7 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<UserResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem("access_token");
     setUser(null);
+    router.push("/");
   };
 
   return (

@@ -6,9 +6,11 @@ import api, { getApiErrorMessage } from "@/lib/api";
 import toast from "react-hot-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomRequests } from "@/hooks/useCustomRequests";
+import { useStoreLinks } from "@/hooks/useStoreLinks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Megaphone, MessageSquare, PackageCheck, PackagePlus, Trash2, Truck } from "lucide-react";
+import { Link as LinkIcon, Megaphone, MessageSquare, PackageCheck, PackagePlus, Trash2, Truck } from "lucide-react";
 import Link from "next/link";
+import { InstagramIcon, ShopeeIcon, WhatsappIcon } from "@/components/ui/SocialIcons";
 import { formatMoney } from "@/lib/formatters";
 import { formatDateTime } from "@/lib/dates";
 import { OrderResponse } from "@/types";
@@ -17,6 +19,7 @@ export default function AdminPage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { products } = useProducts();
   const { requests, isLoading: requestsLoading } = useCustomRequests();
+  const { links } = useStoreLinks();
   const { data: orders, isLoading: ordersLoading } = useQuery({
     queryKey: ["admin-orders"],
     queryFn: async () => {
@@ -26,7 +29,7 @@ export default function AdminPage() {
     enabled: isAuthenticated && user?.role === "admin",
   });
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"products" | "customRequests" | "paidOrders">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "customRequests" | "paidOrders" | "links">("products");
   
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("");
@@ -80,6 +83,22 @@ export default function AdminPage() {
       toast.success("Aviso removido!");
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Erro ao remover aviso."));
+    }
+  };
+
+  const handleSaveLinks = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    try {
+      await api.put("/admin/links", {
+        instagram_url: String(formData.get("instagram_url") || "").trim(),
+        shopee_url: String(formData.get("shopee_url") || "").trim(),
+        whatsapp_url: String(formData.get("whatsapp_url") || "").trim(),
+      });
+      queryClient.invalidateQueries({ queryKey: ["store-links"] });
+      toast.success("Links atualizados com sucesso!");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Erro ao salvar links."));
     }
   };
 
@@ -170,6 +189,14 @@ export default function AdminPage() {
         >
           <PackageCheck className="h-4 w-4" />
           Pedidos pagos
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("links")}
+          className={`soft-button gap-2 ${activeTab === "links" ? "bg-lunart-purple-600 text-white" : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"}`}
+        >
+          <LinkIcon className="h-4 w-4" />
+          Links
         </button>
       </div>
 
@@ -292,7 +319,7 @@ export default function AdminPage() {
             <p className="text-sm text-lunart-white/60">Nenhum pedido sob encomenda encontrado.</p>
           )}
         </div>
-      ) : (
+      ) : activeTab === "paidOrders" ? (
         <div className="glass rounded-lg p-6">
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
             <PackageCheck className="h-5 w-5 text-lunart-pink-300" />
@@ -350,6 +377,61 @@ export default function AdminPage() {
           ) : (
             <p className="text-sm text-lunart-white/60">Nenhum pedido pago aguardando envio.</p>
           )}
+        </div>
+      ) : (
+        <div className="glass rounded-lg p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+            <LinkIcon className="h-5 w-5 text-lunart-pink-300" />
+            Links
+          </h2>
+
+          <form onSubmit={handleSaveLinks} className="flex flex-col gap-4">
+            <div>
+              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-lunart-white/80">
+                <InstagramIcon className="h-4 w-4 text-lunart-pink-300" />
+                Instagram
+              </label>
+              <input
+                type="url"
+                name="instagram_url"
+                key={`instagram-${links?.instagram_url ?? ""}`}
+                defaultValue={links?.instagram_url ?? ""}
+                className="form-field"
+                placeholder="https://instagram.com/sua-loja"
+              />
+            </div>
+            <div>
+              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-lunart-white/80">
+                <ShopeeIcon className="h-4 w-4 text-lunart-pink-300" />
+                Shopee
+              </label>
+              <input
+                type="url"
+                name="shopee_url"
+                key={`shopee-${links?.shopee_url ?? ""}`}
+                defaultValue={links?.shopee_url ?? ""}
+                className="form-field"
+                placeholder="https://shopee.com.br/sua-loja"
+              />
+            </div>
+            <div>
+              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-lunart-white/80">
+                <WhatsappIcon className="h-4 w-4 text-lunart-pink-300" />
+                WhatsApp
+              </label>
+              <input
+                type="url"
+                name="whatsapp_url"
+                key={`whatsapp-${links?.whatsapp_url ?? ""}`}
+                defaultValue={links?.whatsapp_url ?? ""}
+                className="form-field"
+                placeholder="https://wa.me/5500000000000"
+              />
+            </div>
+            <button type="submit" className="soft-button w-fit bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">
+              Salvar links
+            </button>
+          </form>
         </div>
       )}
     </div>

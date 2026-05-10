@@ -106,6 +106,12 @@ export interface ReviewResponse {
   created_at: string;
 }
 
+export interface StoreLinksResponse {
+  instagram_url: string;
+  shopee_url: string;
+  whatsapp_url: string;
+}
+
 export interface CouponResponse {
   id: number;
   code: string;

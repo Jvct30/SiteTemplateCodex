@@ -2,10 +2,12 @@ import shutil
 import uuid
 
 from fastapi import APIRouter, Depends, File, Query, UploadFile
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.dependencies import get_db, require_admin
 from src.models.notice import Notice
+from src.models.store_link import StoreLink
 from src.models.user import User
 from src.repositories.cart_repo import CartRepository
 from src.repositories.coupon_repo import CouponRepository
@@ -25,6 +27,7 @@ from src.schemas.message import MessageCreate, MessageResponse, MessageUpdate
 from src.schemas.notice import NoticeCreate, NoticeResponse
 from src.schemas.order import OrderResponse
 from src.schemas.product import ProductCreate, ProductResponse, ProductUpdate
+from src.schemas.store_link import StoreLinksResponse, StoreLinksUpdate
 from src.services.coupon_service import CouponService
 from src.services.custom_request_service import CustomRequestService
 from src.services.message_service import MessageService
@@ -90,6 +93,37 @@ async def clear_notices(db: AsyncSession = Depends(get_db)):
     await db.execute(stmt)
     await db.commit()
     return {"message": "Avisos desativados"}
+
+# -----------------
+# STORE LINKS
+# -----------------
+@router.put("/links", response_model=StoreLinksResponse)
+async def update_store_links(
+    data: StoreLinksUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    values = {
+        "instagram": data.instagram_url.strip(),
+        "shopee": data.shopee_url.strip(),
+        "whatsapp": data.whatsapp_url.strip(),
+    }
+
+    for platform, url in values.items():
+        result = await db.execute(
+            select(StoreLink).where(StoreLink.platform == platform)
+        )
+        link = result.scalars().first()
+        if link:
+            link.url = url
+        else:
+            db.add(StoreLink(platform=platform, url=url))
+
+    await db.commit()
+    return StoreLinksResponse(
+        instagram_url=values["instagram"],
+        shopee_url=values["shopee"],
+        whatsapp_url=values["whatsapp"],
+    )
 
 # -----------------
 # PRODUCTS

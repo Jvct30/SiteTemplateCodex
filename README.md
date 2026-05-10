@@ -1,86 +1,91 @@
-# SiteTemplateCodex — Template de E-commerce
+# SiteTemplateCodex - E-commerce Template
 
-SiteTemplateCodex é uma base full stack para criar lojas virtuais com catálogo, carrinho, checkout simulado, área do cliente e painel administrativo. O projeto usa nomes, textos e imagens genéricos para servir como ponto de partida para uma marca real.
+Project built with Codex for training with GitHub organizations and AI-assisted coding.
 
-## 🚀 Tecnologias
+SiteTemplateCodex is a full stack starter template for building online stores with a product catalog, cart, simulated checkout, customer profile area, and admin dashboard. The project uses generic names, copy, and placeholder assets so it can be adapted to a real brand.
+
+## Technologies
 
 ### Backend
 - **Framework:** FastAPI
-- **Servidor:** Uvicorn
-- **Banco de Dados:** SQLite (com transição planejada para PostgreSQL)
-- **ORM:** SQLAlchemy 2.0 (Assíncrono)
-- **Migrações:** Alembic
-- **Autenticação:** JWT (`pyjwt`) e hash de senhas (`bcrypt`)
-- **Validações:** Pydantic V2 e `pydantic-br` (validação de CPF)
-- **Upload de Imagens:** Local em desenvolvimento ou Cloudinary via configuração
+- **Server:** Uvicorn
+- **Database:** SQLite by default, with an easy path to PostgreSQL
+- **ORM:** SQLAlchemy 2.0 async
+- **Migrations:** Alembic
+- **Authentication:** JWT with `pyjwt` and password hashing with `bcrypt`
+- **Validation:** Pydantic V2 and `pydantic-br` for CPF validation
+- **Image uploads:** Local storage in development or Cloudinary through configuration
 
 ### Frontend
-- **Framework:** Next.js (App Router)
-- **Estilização:** Tailwind CSS (com paleta base customizável, gradientes e animações fluídas)
-- **Gerenciamento de Estado e Cache:** TanStack Query
-- **Ícones e Fontes:** Outfit e Inter (Google Fonts)
+- **Framework:** Next.js with App Router
+- **Styling:** Tailwind CSS with a customizable base palette, gradients, and animations
+- **State and cache:** TanStack Query
+- **Icons and fonts:** Lucide React, Outfit, and Inter
 
-## 🏗️ Arquitetura
+## Architecture
 
-O projeto adota uma arquitetura em **Monorepo** com separação clara entre os diretórios `frontend/` e `backend/`. 
+The project is organized as a monorepo with separate `frontend/` and `backend/` directories.
 
-O **Backend** implementa os princípios do **SOLID** e utiliza o padrão **Service-Repository** para garantir forte isolamento entre a lógica de negócios e as operações do banco de dados, empregando injeção de dependências e tipagem rigorosa.
+The backend follows SOLID principles and uses a Service-Repository pattern to keep business logic isolated from database access. It also uses dependency injection and typed schemas throughout the API.
 
-### Principais Funcionalidades
-- **Autenticação e Perfil:** Cadastro completo de usuários (com validação de CPF e endereço) e gestão de perfil.
-- **Loja Virtual:** Listagem responsiva de produtos, detalhamento, controle de carrinho de compras e fluxo de checkout com simulador de pagamentos e cálculo de frete (Sedex, Retirada, Uber Flash).
-- **Pedidos Customizados:** Chat assíncrono integrado entre clientes e administração para solicitações, dúvidas e pedidos personalizados.
-- **Painel Administrativo:** Gestão intuitiva de produtos (com upload direto de fotos para nuvem), cupons de desconto, banners/anúncios rotativos da homepage e gerenciamento de status de pedidos.
-- **Design System:** Paleta visual base e componentes prontos para adaptação de marca, com glassmorphism e micro-animações sutis no CSS.
+## Main Features
 
-## ⚙️ Configuração de Ambiente
+- **Authentication and profile:** User registration, login, CPF validation, saved addresses, and profile management.
+- **Online store:** Responsive product listing, product details, cart management, checkout flow, mock payment links, and shipping calculation.
+- **Custom requests:** Async chat between customers and admins for questions, support, and personalized requests.
+- **Admin dashboard:** Product management, image uploads, coupons, homepage notices, social links, and order status updates.
+- **Design system:** Generic visual foundation with reusable styles, placeholder assets, glass effects, and subtle CSS animations.
 
-O projeto foi preparado para rodar em modo desenvolvimento sem custos e trocar serviços por produção com variáveis de ambiente.
+## Environment Setup
 
-`.env.example` é o guia público do formato das variáveis. Ele não deve conter segredos reais. `.env` e `.env.local` são os arquivos privados usados na sua máquina ou configurados na plataforma de deploy.
+The project is prepared to run locally with low-cost development defaults and can be moved to production through environment variables.
+
+`.env.example` should be used as the public guide for required variables. It must not contain real secrets. `.env` and `.env.local` are private files used on your machine or configured in the deployment platform.
 
 ### Backend
-Copie `backend/.env.example` para `backend/.env`.
 
-- `DOMAIN`: domínio principal do projeto.
-- `DATABASE_URL`: usa SQLite por padrão. Para PostgreSQL, use uma URL `postgresql+asyncpg://...`.
-- `FRONTEND_URL`: URL pública do frontend.
-- `PUBLIC_API_URL`: URL pública do backend, usada para gerar links de arquivos locais.
-- `SECRET_KEY`: chave privada usada para assinar JWTs. Nunca commite o valor real.
-- `CORS_ORIGINS`: lista de domínios autorizados a chamar a API pelo navegador.
-- `UPLOAD_STORAGE`: `local` para desenvolvimento ou `cloudinary` para Cloudinary.
-- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: obrigatórios quando `UPLOAD_STORAGE=cloudinary`.
-- `PAYMENT_PROVIDER`: `mock` enquanto o pagamento real não estiver integrado.
+Copy `backend/.env.example` to `backend/.env`.
+
+- `DOMAIN`: Main project domain.
+- `DATABASE_URL`: Uses SQLite by default. For PostgreSQL, use a `postgresql+asyncpg://...` URL.
+- `FRONTEND_URL`: Public frontend URL.
+- `PUBLIC_API_URL`: Public backend URL, used to generate local file links.
+- `SECRET_KEY`: Private key used to sign JWTs. Never commit the real value.
+- `CORS_ORIGINS`: List of domains allowed to call the API from the browser.
+- `UPLOAD_STORAGE`: Use `local` for development or `cloudinary` for Cloudinary.
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: Required when `UPLOAD_STORAGE=cloudinary`.
+- `PAYMENT_PROVIDER`: Use `mock` until a real payment provider is integrated.
 
 ### Frontend
-Copie `frontend/.env.example` para `frontend/.env.local`.
 
-- `NEXT_PUBLIC_API_URL`: URL do backend que o frontend deve chamar.
+Copy `frontend/.env.example` to `frontend/.env.local`.
 
-No Next.js, variáveis com prefixo `NEXT_PUBLIC_` ficam disponíveis no navegador. Use esse prefixo apenas para valores públicos, como URL da API. Nunca coloque segredos, senhas ou chaves privadas no frontend.
+- `NEXT_PUBLIC_API_URL`: Backend URL used by the frontend.
 
-### Diferença entre `.env` e `.env.local`
+In Next.js, variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. Use that prefix only for public values, such as the API URL. Never put secrets, passwords, or private keys in frontend environment variables.
 
-- `backend/.env`: lido pelo FastAPI via `pydantic-settings`; guarda variáveis privadas do servidor, como `DATABASE_URL`, `SECRET_KEY` e chaves de serviços.
-- `frontend/.env.local`: lido pelo Next.js durante desenvolvimento; guarda variáveis do frontend. Neste projeto, ele contém apenas a URL pública da API.
-
-### Como Rodar
+## Running Locally
 
 Backend:
+
 ```bash
 cd backend
 uv run uvicorn src.main:app --reload
 ```
 
 Frontend:
+
 ```bash
 cd frontend
 npm run dev
 ```
 
-## ✅ Testes
+Keep each server running in a separate terminal.
+
+## Tests and Checks
 
 Backend:
+
 ```bash
 cd backend
 uv run pytest
@@ -88,12 +93,14 @@ uv run ruff check .
 ```
 
 Frontend:
+
 ```bash
 cd frontend
 npm test
 npm run lint
 npm run build
 ```
-  
-## 📜 Licença
-Defina a licença conforme o uso do seu projeto.
+
+## License
+
+Define the license according to your intended use.

@@ -1,7 +1,7 @@
 [project]
-name = "lunart-backend"
+name = "sitetemplatecodex-backend"
 version = "1.0.0"
-description = "Backend API for Lunart artisanal e-commerce"
+description = "Backend API for the SiteTemplateCodex e-commerce template"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

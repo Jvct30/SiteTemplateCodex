@@ -7,15 +7,15 @@ import { Toaster } from "react-hot-toast";
 
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { StarField } from "@/components/layout/StarField";
+import { AmbientField } from "@/components/layout/AmbientField";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "Lunart",
+  title: "SiteTemplateCodex",
   description:
-    "Peças feitas a mão com carinho para presentear e decorar o ambiente.",
+    "Template full stack para lojas virtuais com catálogo, carrinho e painel administrativo.",
 };
 
 export default function RootLayout({
@@ -40,7 +40,7 @@ export default function RootLayout({
                 } 
               }} 
             />
-            <StarField />
+            <AmbientField />
             <Header />
             <main className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8 sm:px-6 lg:px-8">
               {children}

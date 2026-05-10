@@ -9,7 +9,7 @@ from httpx import ASGITransport, AsyncClient
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
-os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./test_lunart.db"
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./test_template.db"
 os.environ["SECRET_KEY"] = "test-secret-key"
 os.environ["PUBLIC_API_URL"] = "http://testserver"
 os.environ["UPLOAD_STORAGE"] = "local"

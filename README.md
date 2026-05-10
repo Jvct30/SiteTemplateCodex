@@ -1,6 +1,6 @@
-# ⭐ Lunart — E-commerce Artesanal
+# SiteTemplateCodex — Template de E-commerce
 
-Lunart é uma plataforma de vendas de produtos artesanais feitos a mão para presentear e decorar ambientes. A plataforma permite compra direta ou via carrinho, suporta cálculos de frete variados e possui um chat para pedidos customizados.
+SiteTemplateCodex é uma base full stack para criar lojas virtuais com catálogo, carrinho, checkout simulado, área do cliente e painel administrativo. O projeto usa nomes, textos e imagens genéricos para servir como ponto de partida para uma marca real.
 
 ## 🚀 Tecnologias
 
@@ -16,7 +16,7 @@ Lunart é uma plataforma de vendas de produtos artesanais feitos a mão para pre
 
 ### Frontend
 - **Framework:** Next.js (App Router)
-- **Estilização:** Tailwind CSS (com paleta temática personalizada, gradientes e animações fluídas)
+- **Estilização:** Tailwind CSS (com paleta base customizável, gradientes e animações fluídas)
 - **Gerenciamento de Estado e Cache:** TanStack Query
 - **Ícones e Fontes:** Outfit e Inter (Google Fonts)
 
@@ -29,9 +29,9 @@ O **Backend** implementa os princípios do **SOLID** e utiliza o padrão **Servi
 ### Principais Funcionalidades
 - **Autenticação e Perfil:** Cadastro completo de usuários (com validação de CPF e endereço) e gestão de perfil.
 - **Loja Virtual:** Listagem responsiva de produtos, detalhamento, controle de carrinho de compras e fluxo de checkout com simulador de pagamentos e cálculo de frete (Sedex, Retirada, Uber Flash).
-- **Pedidos Customizados:** Chat assíncrono integrado entre clientes e a administração da loja para a negociação e solicitação de peças artesanais personalizadas.
+- **Pedidos Customizados:** Chat assíncrono integrado entre clientes e administração para solicitações, dúvidas e pedidos personalizados.
 - **Painel Administrativo:** Gestão intuitiva de produtos (com upload direto de fotos para nuvem), cupons de desconto, banners/anúncios rotativos da homepage e gerenciamento de status de pedidos.
-- **Design System:** Paleta visual fluida focada em tons de roxo, rosa e cores escuras (quase preto), com glassmorphism e micro-animações sutis no CSS.
+- **Design System:** Paleta visual base e componentes prontos para adaptação de marca, com glassmorphism e micro-animações sutis no CSS.
 
 ## ⚙️ Configuração de Ambiente
 
@@ -96,4 +96,4 @@ npm run build
 ```
   
 ## 📜 Licença
-Projeto de uso restrito e proprietário.
+Defina a licença conforme o uso do seu projeto.

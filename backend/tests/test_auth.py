@@ -5,7 +5,7 @@ from httpx import AsyncClient
 @pytest.mark.asyncio
 async def test_register_and_login(client: AsyncClient) -> None:
     user_payload = {
-        "full_name": "Cliente Lunart",
+        "full_name": "Cliente Template",
         "username": "cliente",
         "email": "cliente@example.com",
         "password": "secret123",

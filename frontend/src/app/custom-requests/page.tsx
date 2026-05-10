@@ -21,10 +21,10 @@ export default function CustomRequestsPage() {
     return (
       <div className="mx-auto mt-20 max-w-lg rounded-lg glass p-8 text-center">
         <h1 className="mb-3 text-2xl font-bold">Entre para criar encomendas</h1>
-        <p className="mb-6 text-lunart-white/60">
+        <p className="mb-6 text-template-white/60">
           Pedidos personalizados precisam de uma conta para manter o histórico do chat.
         </p>
-        <Link href="/login" className="soft-button bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">
+        <Link href="/login" className="soft-button bg-template-purple-600 text-white hover:bg-template-purple-500">
           Fazer login
         </Link>
       </div>
@@ -56,7 +56,7 @@ export default function CustomRequestsPage() {
         <h1 className="text-3xl font-display font-bold">Pedidos Sob Encomenda</h1>
         <button 
           onClick={() => setIsCreating(!isCreating)}
-          className="soft-button gap-2 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500"
+          className="soft-button gap-2 bg-template-purple-600 text-white hover:bg-template-purple-500"
         >
           <Plus className="w-5 h-5" /> Novo Pedido
         </button>
@@ -74,8 +74,8 @@ export default function CustomRequestsPage() {
             onClick={() => setStatusFilter(item.value as typeof statusFilter)}
             className={`soft-button ${
               statusFilter === item.value
-                ? "bg-lunart-purple-600 text-white"
-                : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"
+                ? "bg-template-purple-600 text-white"
+                : "bg-template-surface-light text-template-white/70 hover:text-white"
             }`}
           >
             {item.label}
@@ -104,8 +104,8 @@ export default function CustomRequestsPage() {
               className="form-field"
             />
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setIsCreating(false)} className="soft-button hover:bg-lunart-surface-light">Cancelar</button>
-              <button type="submit" className="soft-button bg-lunart-pink-500 text-white hover:bg-lunart-pink-400">Enviar Pedido</button>
+              <button type="button" onClick={() => setIsCreating(false)} className="soft-button hover:bg-template-surface-light">Cancelar</button>
+              <button type="submit" className="soft-button bg-template-pink-500 text-white hover:bg-template-pink-400">Enviar Pedido</button>
             </div>
           </div>
         </form>
@@ -114,7 +114,7 @@ export default function CustomRequestsPage() {
       {isLoading ? (
         <div className="text-center">Carregando...</div>
       ) : filteredRequests?.length === 0 ? (
-        <div className="text-center text-lunart-white/60 py-12 glass rounded-lg">
+        <div className="text-center text-template-white/60 py-12 glass rounded-lg">
           Nenhum pedido encontrado neste filtro.
         </div>
       ) : (
@@ -123,21 +123,21 @@ export default function CustomRequestsPage() {
             <Link 
               href={`/custom-requests/${req.id}`} 
               key={req.id}
-              className="glass flex flex-col gap-4 rounded-lg p-5 transition-colors hover:border-lunart-pink-400 sm:flex-row sm:items-center sm:justify-between"
+              className="glass flex flex-col gap-4 rounded-lg p-5 transition-colors hover:border-template-pink-400 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
                 <h3 className="font-bold text-lg">{req.subject}</h3>
-                <span className="text-xs text-lunart-white/40">{formatDateTime(req.created_at)}</span>
+                <span className="text-xs text-template-white/40">{formatDateTime(req.created_at)}</span>
               </div>
               <div className="flex items-center gap-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                   req.status === 'open' ? 'bg-blue-500/20 text-blue-300' :
                   req.status === 'answered' ? 'bg-green-500/20 text-green-300' :
-                  'bg-lunart-surface-light'
+                  'bg-template-surface-light'
                 }`}>
                   {req.status.toUpperCase()}
                 </span>
-                <MessageSquare className="w-5 h-5 text-lunart-white/60" />
+                <MessageSquare className="w-5 h-5 text-template-white/60" />
               </div>
             </Link>
           ))}

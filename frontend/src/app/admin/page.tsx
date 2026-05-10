@@ -164,20 +164,20 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-4xl mx-auto w-full">
-      <h1 className="text-3xl font-display font-bold mb-8 text-lunart-star">Painel Administrativo</h1>
+      <h1 className="text-3xl font-display font-bold mb-8 text-template-accent">Painel Administrativo</h1>
 
       <div className="mb-8 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => setActiveTab("products")}
-          className={`soft-button ${activeTab === "products" ? "bg-lunart-purple-600 text-white" : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"}`}
+          className={`soft-button ${activeTab === "products" ? "bg-template-purple-600 text-white" : "bg-template-surface-light text-template-white/70 hover:text-white"}`}
         >
           Produtos
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("customRequests")}
-          className={`soft-button gap-2 ${activeTab === "customRequests" ? "bg-lunart-purple-600 text-white" : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"}`}
+          className={`soft-button gap-2 ${activeTab === "customRequests" ? "bg-template-purple-600 text-white" : "bg-template-surface-light text-template-white/70 hover:text-white"}`}
         >
           <MessageSquare className="h-4 w-4" />
           Ver pedidos sob encomenda
@@ -185,7 +185,7 @@ export default function AdminPage() {
         <button
           type="button"
           onClick={() => setActiveTab("paidOrders")}
-          className={`soft-button gap-2 ${activeTab === "paidOrders" ? "bg-lunart-purple-600 text-white" : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"}`}
+          className={`soft-button gap-2 ${activeTab === "paidOrders" ? "bg-template-purple-600 text-white" : "bg-template-surface-light text-template-white/70 hover:text-white"}`}
         >
           <PackageCheck className="h-4 w-4" />
           Pedidos pagos
@@ -193,7 +193,7 @@ export default function AdminPage() {
         <button
           type="button"
           onClick={() => setActiveTab("links")}
-          className={`soft-button gap-2 ${activeTab === "links" ? "bg-lunart-purple-600 text-white" : "bg-lunart-surface-light text-lunart-white/70 hover:text-white"}`}
+          className={`soft-button gap-2 ${activeTab === "links" ? "bg-template-purple-600 text-white" : "bg-template-surface-light text-template-white/70 hover:text-white"}`}
         >
           <LinkIcon className="h-4 w-4" />
           Links
@@ -205,7 +205,7 @@ export default function AdminPage() {
         
         <div className="glass rounded-lg p-6">
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
-            <PackagePlus className="h-5 w-5 text-lunart-pink-300" />
+            <PackagePlus className="h-5 w-5 text-template-pink-300" />
             Adicionar Produto
           </h2>
           <form onSubmit={handleCreateProduct} className="flex flex-col gap-4">
@@ -225,12 +225,12 @@ export default function AdminPage() {
             </div>
             <div>
               <label className="block text-xs mb-1">Upload de Imagem</label>
-              <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={uploading} className="form-field file:mr-4 file:rounded-full file:border-0 file:bg-lunart-purple-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-lunart-purple-500" />
-              {uploading && <span className="text-xs text-lunart-pink-400 mt-1 block">Enviando...</span>}
+              <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={uploading} className="form-field file:mr-4 file:rounded-full file:border-0 file:bg-template-purple-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-template-purple-500" />
+              {uploading && <span className="text-xs text-template-pink-400 mt-1 block">Enviando...</span>}
               {imageUrls.length > 0 && (
                 <div className="mt-2 flex flex-col gap-1 text-xs text-green-400">
                   <span>{imageUrls.length > 1 ? "Imagens enviadas com sucesso!" : "Imagem enviada com sucesso!"}</span>
-                  <span className="text-lunart-white/45">A ordem das fotos segue a ordem dos uploads.</span>
+                  <span className="text-template-white/45">A ordem das fotos segue a ordem dos uploads.</span>
                 </div>
               )}
             </div>
@@ -242,7 +242,7 @@ export default function AdminPage() {
               <label className="block text-xs mb-1">Descrição</label>
               <textarea value={productDesc} onChange={e=>setProductDesc(e.target.value)} className="form-field" rows={3}></textarea>
             </div>
-            <button type="submit" className="soft-button mt-2 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">Criar Produto</button>
+            <button type="submit" className="soft-button mt-2 bg-template-purple-600 text-white hover:bg-template-purple-500">Criar Produto</button>
           </form>
         </div>
 
@@ -251,13 +251,13 @@ export default function AdminPage() {
           {/* Notice Box */}
           <div className="glass rounded-lg p-6">
             <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
-              <Megaphone className="h-5 w-5 text-lunart-pink-300" />
+              <Megaphone className="h-5 w-5 text-template-pink-300" />
               Aviso da Loja
             </h2>
             <div className="flex flex-col gap-3">
               <input type="text" value={noticeText} onChange={e=>setNoticeText(e.target.value)} className="form-field" placeholder="Ex: Estamos em promoção! Use o cupom PROMO10" />
               <div className="flex gap-2">
-                <button onClick={handleSaveNotice} className="soft-button flex-1 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">Ativar</button>
+                <button onClick={handleSaveNotice} className="soft-button flex-1 bg-template-purple-600 text-white hover:bg-template-purple-500">Ativar</button>
                 <button onClick={handleRemoveNotice} className="soft-button flex-1 border border-red-500/50 bg-red-500/20 text-red-300 hover:bg-red-500/30">Remover</button>
               </div>
             </div>
@@ -267,17 +267,17 @@ export default function AdminPage() {
             <h2 className="text-xl font-bold mb-4">Gerenciar Produtos</h2>
             <div className="flex flex-col gap-2">
               {products?.map(p => (
-                <div key={p.id} className="flex justify-between items-center bg-lunart-surface-light p-3 rounded-lg border border-lunart-white/5">
+                <div key={p.id} className="flex justify-between items-center bg-template-surface-light p-3 rounded-lg border border-template-white/5">
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold">{p.name}</span>
-                    <span className="text-xs text-lunart-pink-400">{formatMoney(p.price)} | Estoque: {p.stock}</span>
+                    <span className="text-xs text-template-pink-400">{formatMoney(p.price)} | Estoque: {p.stock}</span>
                   </div>
                   <button onClick={() => handleDeleteProduct(p.id)} className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               ))}
-              {!products?.length && <p className="text-sm text-lunart-white/60">Nenhum produto cadastrado.</p>}
+              {!products?.length && <p className="text-sm text-template-white/60">Nenhum produto cadastrado.</p>}
             </div>
           </div>
 
@@ -287,28 +287,28 @@ export default function AdminPage() {
       ) : activeTab === "customRequests" ? (
         <div className="glass rounded-lg p-6">
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
-            <MessageSquare className="h-5 w-5 text-lunart-pink-300" />
+            <MessageSquare className="h-5 w-5 text-template-pink-300" />
             Pedidos sob encomenda
           </h2>
 
           {requestsLoading ? (
-            <p className="text-sm text-lunart-white/60">Carregando pedidos...</p>
+            <p className="text-sm text-template-white/60">Carregando pedidos...</p>
           ) : requests?.length ? (
             <div className="flex flex-col gap-3">
               {requests.map((request) => (
                 <Link
                   key={request.id}
                   href={`/custom-requests/${request.id}`}
-                  className="rounded-lg border border-lunart-white/10 bg-lunart-surface-light p-4 transition-colors hover:border-lunart-pink-300"
+                  className="rounded-lg border border-template-white/10 bg-template-surface-light p-4 transition-colors hover:border-template-pink-300"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h3 className="font-semibold">{request.subject}</h3>
-                      <p className="text-xs text-lunart-white/45">
+                      <p className="text-xs text-template-white/45">
                         Cliente #{request.user_id} • {formatDateTime(request.created_at)}
                       </p>
                     </div>
-                    <span className="w-fit rounded-full bg-lunart-white/10 px-3 py-1 text-xs font-bold uppercase text-lunart-pink-300">
+                    <span className="w-fit rounded-full bg-template-white/10 px-3 py-1 text-xs font-bold uppercase text-template-pink-300">
                       {request.status}
                     </span>
                   </div>
@@ -316,45 +316,45 @@ export default function AdminPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-lunart-white/60">Nenhum pedido sob encomenda encontrado.</p>
+            <p className="text-sm text-template-white/60">Nenhum pedido sob encomenda encontrado.</p>
           )}
         </div>
       ) : activeTab === "paidOrders" ? (
         <div className="glass rounded-lg p-6">
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
-            <PackageCheck className="h-5 w-5 text-lunart-pink-300" />
+            <PackageCheck className="h-5 w-5 text-template-pink-300" />
             Pedidos pagos para envio
           </h2>
 
           {ordersLoading ? (
-            <p className="text-sm text-lunart-white/60">Carregando pedidos...</p>
+            <p className="text-sm text-template-white/60">Carregando pedidos...</p>
           ) : paidOrders.length ? (
             <div className="flex flex-col gap-3">
               {paidOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="rounded-lg border border-lunart-white/10 bg-lunart-surface-light p-4 transition-colors hover:border-lunart-pink-300"
+                    className="rounded-lg border border-template-white/10 bg-template-surface-light p-4 transition-colors hover:border-template-pink-300"
                   >
                     <div className="flex flex-col gap-3">
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <h3 className="font-semibold">Pedido #{order.id}</h3>
-                          <p className="text-xs text-lunart-white/45">{formatDateTime(order.created_at)}</p>
+                          <p className="text-xs text-template-white/45">{formatDateTime(order.created_at)}</p>
                         </div>
                         <div className="flex flex-col gap-2 sm:items-end">
-                          <span className="text-lg font-bold text-lunart-pink-300">{formatMoney(order.total)}</span>
-                          <span className="w-fit rounded-full bg-lunart-white/10 px-3 py-1 text-xs font-bold uppercase text-lunart-pink-300">
+                          <span className="text-lg font-bold text-template-pink-300">{formatMoney(order.total)}</span>
+                          <span className="w-fit rounded-full bg-template-white/10 px-3 py-1 text-xs font-bold uppercase text-template-pink-300">
                             {order.status === "shipped" ? "Enviado" : "Pago"}
                           </span>
                         </div>
                       </div>
-                      <div className="text-sm text-lunart-white/65">
+                      <div className="text-sm text-template-white/65">
                         {order.shipping_address_text || "Retirada na loja"}
                       </div>
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <Link
                           href={order.support_request_id ? `/custom-requests/${order.support_request_id}` : `/profile/orders/${order.id}`}
-                          className="text-sm font-medium text-lunart-pink-300 hover:text-lunart-pink-200"
+                          className="text-sm font-medium text-template-pink-300 hover:text-template-pink-200"
                         >
                           {order.support_request_id ? "Abrir chat do pedido" : "Ver detalhes do pedido"}
                         </Link>
@@ -363,7 +363,7 @@ export default function AdminPage() {
                             type="button"
                             onClick={() => handleMarkOrderShipped(order.id)}
                             disabled={shippingOrderId === order.id}
-                            className="soft-button gap-2 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500"
+                            className="soft-button gap-2 bg-template-purple-600 text-white hover:bg-template-purple-500"
                           >
                             <Truck className="h-4 w-4" />
                             {shippingOrderId === order.id ? "Marcando..." : "Marcar pedido como enviado"}
@@ -375,20 +375,20 @@ export default function AdminPage() {
                 ))}
             </div>
           ) : (
-            <p className="text-sm text-lunart-white/60">Nenhum pedido pago aguardando envio.</p>
+            <p className="text-sm text-template-white/60">Nenhum pedido pago aguardando envio.</p>
           )}
         </div>
       ) : (
         <div className="glass rounded-lg p-6">
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
-            <LinkIcon className="h-5 w-5 text-lunart-pink-300" />
+            <LinkIcon className="h-5 w-5 text-template-pink-300" />
             Links
           </h2>
 
           <form onSubmit={handleSaveLinks} className="flex flex-col gap-4">
             <div>
-              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-lunart-white/80">
-                <InstagramIcon className="h-4 w-4 text-lunart-pink-300" />
+              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-template-white/80">
+                <InstagramIcon className="h-4 w-4 text-template-pink-300" />
                 Instagram
               </label>
               <input
@@ -401,8 +401,8 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-lunart-white/80">
-                <ShopeeIcon className="h-4 w-4 text-lunart-pink-300" />
+              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-template-white/80">
+                <ShopeeIcon className="h-4 w-4 text-template-pink-300" />
                 Shopee
               </label>
               <input
@@ -415,8 +415,8 @@ export default function AdminPage() {
               />
             </div>
             <div>
-              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-lunart-white/80">
-                <WhatsappIcon className="h-4 w-4 text-lunart-pink-300" />
+              <label className="mb-1 flex items-center gap-2 text-sm font-medium text-template-white/80">
+                <WhatsappIcon className="h-4 w-4 text-template-pink-300" />
                 WhatsApp
               </label>
               <input
@@ -428,7 +428,7 @@ export default function AdminPage() {
                 placeholder="https://wa.me/5500000000000"
               />
             </div>
-            <button type="submit" className="soft-button w-fit bg-lunart-purple-600 text-white hover:bg-lunart-purple-500">
+            <button type="submit" className="soft-button w-fit bg-template-purple-600 text-white hover:bg-template-purple-500">
               Salvar links
             </button>
           </form>

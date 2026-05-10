@@ -9,16 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        lunart: {
-          bg: "#0f0a1a",           // Fundo principal — quase-preto com tom roxo
-          surface: "#1a1230",      // Cards, painéis
+        template: {
+          bg: "#0f172a",
+          surface: "#111827",
           "surface-light": "#241a40",
           pink: { 300: "#f9a8d4", 400: "#f472b6", 500: "#ec4899" },
           purple: { 300: "#c4b5fd", 400: "#a78bfa", 500: "#8b5cf6", 600: "#7c3aed", 700: "#6d28d9" },
-          star: "#fbbf24",         // Amarelo estrela
-          moon: "#fde68a",         // Amarelo lua
-          cloud: "#bae6fd",        // Azul claro nuvem
-          white: "#faf5ff",        // Branco com leve tom roxo
+          accent: "#38bdf8",
+          highlight: "#fde68a",
+          cloud: "#bae6fd",
+          white: "#f8fafc",
         },
       },
       fontFamily: {
@@ -26,8 +26,8 @@ const config: Config = {
         display: ["var(--font-outfit)", "sans-serif"],
       },
       backgroundImage: {
-        "lunart-gradient": "linear-gradient(135deg, #faf5ff 0%, #f9a8d4 35%, #c4b5fd 65%, #8b5cf6 100%)",
-        "lunart-dark": "linear-gradient(180deg, #0f0a1a 0%, #1a1230 50%, #241a40 100%)",
+        "template-gradient": "linear-gradient(135deg, #faf5ff 0%, #f9a8d4 35%, #c4b5fd 65%, #8b5cf6 100%)",
+        "template-dark": "linear-gradient(180deg, #0f0a1a 0%, #1a1230 50%, #241a40 100%)",
         "hero-gradient": "linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #6d28d9 100%)",
       },
       animation: {

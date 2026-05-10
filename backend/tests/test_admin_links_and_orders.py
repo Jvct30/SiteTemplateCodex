@@ -14,7 +14,7 @@ async def register_and_login(
     await client.post(
         "/auth/register",
         json={
-            "full_name": f"{username.title()} Lunart",
+            "full_name": f"{username.title()} Template",
             "username": username,
             "email": email,
             "password": "secret123",
@@ -49,8 +49,8 @@ async def test_admin_links_are_saved_and_publicly_available(client: AsyncClient)
     admin_token = await create_admin_token(client)
 
     payload = {
-        "instagram_url": "https://instagram.com/lunart",
-        "shopee_url": "https://shopee.com.br/lunart",
+        "instagram_url": "https://instagram.com/template",
+        "shopee_url": "https://shopee.com.br/template",
         "whatsapp_url": "https://wa.me/5511999999999",
     }
     update_response = await client.put(
@@ -78,7 +78,7 @@ async def test_paid_order_can_be_marked_shipped_and_notifies_support_chat(
         headers=admin_header,
         json={
             "name": "Produto de Teste",
-            "description": "Peça artesanal",
+            "description": "Produto de exemplo",
             "price": "40.00",
             "stock": 3,
             "image_url": None,

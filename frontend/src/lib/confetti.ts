@@ -1,6 +1,6 @@
 import confetti from "canvas-confetti";
 
-export const triggerStars = (e: React.MouseEvent | null) => {
+export const triggerConfetti = (e: React.MouseEvent | null) => {
   let origin = { x: 0.5, y: 0.5 };
   
   if (e) {
@@ -15,9 +15,8 @@ export const triggerStars = (e: React.MouseEvent | null) => {
     particleCount: 50,
     spread: 60,
     origin,
-    colors: ['#fbbf24', '#fde68a', '#f59e0b'],
-    shapes: ['star'],
-    scalar: 1.2,
+    colors: ["#38bdf8", "#818cf8", "#f472b6"],
+    scalar: 1,
     ticks: 60,
     zIndex: 9999
   });
@@ -25,6 +24,6 @@ export const triggerStars = (e: React.MouseEvent | null) => {
 
 export const triggerCartPulse = () => {
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event("lunart:cart-pulse"));
+    window.dispatchEvent(new Event("template:cart-pulse"));
   }
 };

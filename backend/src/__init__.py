@@ -1,1 +1,1 @@
-# Lunart Backend - Source Package
+# SiteTemplateCodex backend source package

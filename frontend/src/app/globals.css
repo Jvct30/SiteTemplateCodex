@@ -3,7 +3,7 @@
 
 @layer base {
   body {
-    @apply bg-lunart-bg text-lunart-white min-h-screen font-sans;
+    @apply bg-template-bg text-template-white min-h-screen font-sans;
     background:
       radial-gradient(circle at 50% -20%, rgba(186, 230, 253, 0.14), transparent 34rem),
       linear-gradient(180deg, #0f0a1a 0%, #151022 42%, #1b1530 100%);
@@ -14,17 +14,17 @@
   input,
   select,
   textarea {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lunart-pink-300 focus-visible:ring-offset-2 focus-visible:ring-offset-lunart-bg;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-template-pink-300 focus-visible:ring-offset-2 focus-visible:ring-offset-template-bg;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply border border-lunart-white/10 bg-lunart-surface/75 shadow-[0_18px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl;
+    @apply border border-template-white/10 bg-template-surface/75 shadow-[0_18px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl;
   }
 
   .form-field {
-    @apply w-full rounded-lg border border-lunart-white/10 bg-lunart-surface-light px-4 py-3 text-sm text-lunart-white placeholder:text-lunart-white/35 transition-colors focus:border-lunart-pink-300;
+    @apply w-full rounded-lg border border-template-white/10 bg-template-surface-light px-4 py-3 text-sm text-template-white placeholder:text-template-white/35 transition-colors focus:border-template-pink-300;
   }
 
   .soft-button {
@@ -44,13 +44,13 @@
     width: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-lunart-bg;
+    @apply bg-template-bg;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-lunart-purple-600 rounded-full;
+    @apply bg-template-purple-600 rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-lunart-purple-500;
+    @apply bg-template-purple-500;
   }
 }
 

@@ -14,7 +14,7 @@ async def register_and_login(
     await client.post(
         "/auth/register",
         json={
-            "full_name": f"{username.title()} Lunart",
+            "full_name": f"{username.title()} Template",
             "username": username,
             "email": email,
             "password": "secret123",
@@ -50,7 +50,7 @@ async def test_checkout_creates_pending_order_with_mock_payment_link(
         headers={"Authorization": f"Bearer {admin_token}"},
         json={
             "name": "Lua de Crochê",
-            "description": "Peça artesanal",
+            "description": "Produto de exemplo",
             "price": "30.00",
             "stock": 2,
             "image_url": None,

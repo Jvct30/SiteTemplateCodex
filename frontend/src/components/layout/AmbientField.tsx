@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-interface Star {
+interface AmbientDot {
   id: number;
   x: string;
   y: string;
@@ -12,7 +12,7 @@ interface Star {
   delay: string;
 }
 
-const stars: Star[] = Array.from({ length: 64 }, (_, i) => {
+const ambientDots: AmbientDot[] = Array.from({ length: 64 }, (_, i) => {
   const xSeed = Math.sin(i * 12.9898) * 43758.5453;
   const ySeed = Math.sin(i * 78.233) * 24634.6345;
   const sizeSeed = Math.sin(i * 39.425) * 9658.234;
@@ -29,7 +29,7 @@ const stars: Star[] = Array.from({ length: 64 }, (_, i) => {
   };
 });
 
-export function StarField() {
+export function AmbientField() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -46,18 +46,18 @@ export function StarField() {
 
   return (
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      {stars.map((star) => (
+      {ambientDots.map((dot) => (
         <div
-          key={star.id}
-          className="absolute rounded-full bg-lunart-star animate-twinkle transition-transform duration-700 ease-out"
+          key={dot.id}
+          className="absolute rounded-full bg-template-accent animate-twinkle transition-transform duration-700 ease-out"
           style={{
-            left: `${star.x}%`,
-            top: `${star.y}%`,
-            width: `${star.size}px`,
-            height: `${star.size}px`,
-            animationDuration: `${star.duration}s`,
-            animationDelay: `${star.delay}s`,
-            transform: `translate(${(mousePos.x * star.parallax).toFixed(4)}px, ${(mousePos.y * star.parallax).toFixed(4)}px)`,
+            left: `${dot.x}%`,
+            top: `${dot.y}%`,
+            width: `${dot.size}px`,
+            height: `${dot.size}px`,
+            animationDuration: `${dot.duration}s`,
+            animationDelay: `${dot.delay}s`,
+            transform: `translate(${(mousePos.x * dot.parallax).toFixed(4)}px, ${(mousePos.y * dot.parallax).toFixed(4)}px)`,
           }}
         />
       ))}

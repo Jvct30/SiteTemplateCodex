@@ -25,8 +25,8 @@ export function Header() {
   const navLinkClass = (href: string) =>
     `rounded-full px-3 py-2 text-sm font-medium transition-colors ${
       pathname === href
-        ? "bg-lunart-white/10 text-lunart-white"
-        : "text-lunart-white/70 hover:bg-lunart-white/10 hover:text-lunart-white"
+        ? "bg-template-white/10 text-template-white"
+        : "text-template-white/70 hover:bg-template-white/10 hover:text-template-white"
     }`;
 
   useEffect(() => {
@@ -35,24 +35,24 @@ export function Header() {
       window.setTimeout(() => setIsCartPulsing(false), 650);
     };
 
-    window.addEventListener("lunart:cart-pulse", pulseCart);
-    return () => window.removeEventListener("lunart:cart-pulse", pulseCart);
+    window.addEventListener("template:cart-pulse", pulseCart);
+    return () => window.removeEventListener("template:cart-pulse", pulseCart);
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-lunart-white/10 bg-lunart-bg/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-template-white/10 bg-template-bg/85 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2" onClick={closeMenu}>
           <Image
-            src="/lunart-logo.png"
-            alt="Lunart"
+            src="/template-logo.png"
+            alt="Template Store"
             width={34}
             height={34}
             className="rounded-full"
             priority
           />
-          <span className="text-2xl font-display font-bold text-transparent bg-clip-text bg-lunart-gradient">
-            Lunart
+          <span className="text-2xl font-display font-bold text-transparent bg-clip-text bg-template-gradient">
+            Template Store
           </span>
         </Link>
 
@@ -72,15 +72,15 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/cart"
-            className={`relative rounded-full p-2 transition-colors hover:bg-lunart-white/10 ${
-              isCartPulsing ? "animate-cart-pop bg-lunart-pink-500/20 text-lunart-pink-300" : ""
+            className={`relative rounded-full p-2 transition-colors hover:bg-template-white/10 ${
+              isCartPulsing ? "animate-cart-pop bg-template-pink-500/20 text-template-pink-300" : ""
             }`}
             aria-label="Abrir carrinho"
             onClick={closeMenu}
           >
             <ShoppingCart className={isCartPulsing ? "h-5 w-5 animate-cart-wiggle" : "h-5 w-5"} />
             {cartItemCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-lunart-pink-500 px-1 text-xs font-bold">
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-template-pink-500 px-1 text-xs font-bold">
                 {cartItemCount}
               </span>
             )}
@@ -90,7 +90,7 @@ export function Header() {
             <div className="hidden items-center gap-1 sm:flex">
               <Link
                 href="/profile"
-                className="rounded-full p-2 transition-colors hover:bg-lunart-white/10"
+                className="rounded-full p-2 transition-colors hover:bg-template-white/10"
                 aria-label="Abrir perfil"
               >
                 <User className="w-5 h-5" />
@@ -106,7 +106,7 @@ export function Header() {
           ) : (
             <Link
               href="/login"
-              className="hidden rounded-full bg-lunart-white px-4 py-2 text-sm font-bold text-lunart-bg transition-colors hover:bg-lunart-pink-300 sm:inline-flex"
+              className="hidden rounded-full bg-template-white px-4 py-2 text-sm font-bold text-template-bg transition-colors hover:bg-template-pink-300 sm:inline-flex"
               onClick={closeMenu}
             >
               Entrar
@@ -115,7 +115,7 @@ export function Header() {
 
           <button
             onClick={() => setIsMenuOpen((value) => !value)}
-            className="rounded-full p-2 transition-colors hover:bg-lunart-white/10 md:hidden"
+            className="rounded-full p-2 transition-colors hover:bg-template-white/10 md:hidden"
             aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
             aria-expanded={isMenuOpen}
           >
@@ -125,7 +125,7 @@ export function Header() {
       </div>
 
       {isMenuOpen && (
-        <div className="border-t border-lunart-white/10 bg-lunart-bg/95 px-4 py-4 backdrop-blur-xl md:hidden">
+        <div className="border-t border-template-white/10 bg-template-bg/95 px-4 py-4 backdrop-blur-xl md:hidden">
           <nav className="container mx-auto flex flex-col gap-2">
             {navItems.map((item) => (
               <Link

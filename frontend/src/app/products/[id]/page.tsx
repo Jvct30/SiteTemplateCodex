@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { triggerCartPulse, triggerStars } from "@/lib/confetti";
+import { triggerCartPulse, triggerConfetti } from "@/lib/confetti";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { getApiErrorMessage } from "@/lib/api";
 import Link from "next/link";
@@ -22,7 +22,7 @@ export default function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(0);
 
   if (isLoading) {
-    return <div className="flex justify-center mt-20"><div className="w-12 h-12 rounded-full border-4 border-lunart-purple-500 border-t-transparent animate-spin"></div></div>;
+    return <div className="flex justify-center mt-20"><div className="w-12 h-12 rounded-full border-4 border-template-purple-500 border-t-transparent animate-spin"></div></div>;
   }
 
   if (error || !product) {
@@ -32,7 +32,7 @@ export default function ProductDetails() {
   const variations = product.variations ?? [];
   const productImages = product.image_urls?.length
     ? product.image_urls
-    : [product.image_url || "/Lunart-Header.jpg"];
+    : [product.image_url || "/template-hero.jpg"];
   const activeVariation =
     selectedVariation && variations.includes(selectedVariation)
       ? selectedVariation
@@ -47,7 +47,7 @@ export default function ProductDetails() {
         variation: activeVariation || undefined 
       });
       try {
-        triggerStars(e);
+        triggerConfetti(e);
       } catch {
         // Visual feedback should never turn a successful cart action into an error.
       }
@@ -62,14 +62,14 @@ export default function ProductDetails() {
 
   return (
     <div className="max-w-5xl mx-auto w-full mt-8">
-      <Link href="/" className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-lunart-white/65 transition-colors hover:text-lunart-pink-300">
+      <Link href="/" className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-template-white/65 transition-colors hover:text-template-pink-300">
         <ArrowLeft className="h-4 w-4" />
         Voltar para a loja
       </Link>
 
       <div className="grid grid-cols-1 gap-10 rounded-lg glass p-5 animate-slide-up md:grid-cols-2 md:p-8">
         <div>
-          <div className="relative aspect-square overflow-hidden rounded-lg border border-lunart-white/10 bg-lunart-surface-light">
+          <div className="relative aspect-square overflow-hidden rounded-lg border border-template-white/10 bg-template-surface-light">
             <Image
               src={productImages[selectedImage] || productImages[0]}
               alt={product.name}
@@ -85,7 +85,7 @@ export default function ProductDetails() {
                   type="button"
                   onClick={() => setSelectedImage(index)}
                   className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border ${
-                    selectedImage === index ? "border-lunart-pink-300" : "border-lunart-white/10"
+                    selectedImage === index ? "border-template-pink-300" : "border-template-white/10"
                   }`}
                   aria-label={`Ver foto ${index + 1}`}
                 >
@@ -98,13 +98,13 @@ export default function ProductDetails() {
 
         <div className="flex flex-col">
           <h1 className="text-4xl font-display font-bold mb-4">{product.name}</h1>
-          <p className="text-lunart-white/80 text-lg mb-8 leading-relaxed">
-            {product.description || "Esta é uma peça única, feita com muito amor e cuidado."}
+          <p className="text-template-white/80 text-lg mb-8 leading-relaxed">
+            {product.description || "Descrição padrão do produto. Substitua este texto pelo conteúdo da sua loja."}
           </p>
 
           {variations.length > 0 && (
             <div className="mb-8">
-              <span className="text-sm text-lunart-white/60 block mb-3">Escolha a Variação</span>
+              <span className="text-sm text-template-white/60 block mb-3">Escolha a Variação</span>
               <div className="flex flex-wrap gap-3">
                 {variations.map((v) => (
                   <button
@@ -112,8 +112,8 @@ export default function ProductDetails() {
                     onClick={() => setSelectedVariation(v)}
                     className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-all ${
                       activeVariation === v 
-                        ? "border-lunart-purple-400 bg-lunart-purple-600 text-white" 
-                        : "bg-lunart-surface-light border-lunart-purple-500/20 text-lunart-white/70 hover:border-lunart-purple-400"
+                        ? "border-template-purple-400 bg-template-purple-600 text-white"
+                        : "bg-template-surface-light border-template-purple-500/20 text-template-white/70 hover:border-template-purple-400"
                     }`}
                   >
                     {v}
@@ -125,7 +125,7 @@ export default function ProductDetails() {
 
           <div className="mt-auto">
             <div className="mb-6">
-              <span className="text-sm text-lunart-white/60 block mb-1">Preço Final</span>
+              <span className="text-sm text-template-white/60 block mb-1">Preço Final</span>
               <span className="text-5xl font-bold text-transparent bg-clip-text bg-hero-gradient">
                 {formatMoney(product.price)}
               </span>
@@ -135,13 +135,13 @@ export default function ProductDetails() {
               <button 
                 onClick={handleAddToCart}
                 disabled={adding || product.stock <= 0}
-                className="soft-button flex-1 gap-2 bg-lunart-purple-600 py-4 text-lg text-white hover:bg-lunart-purple-500"
+                className="soft-button flex-1 gap-2 bg-template-purple-600 py-4 text-lg text-white hover:bg-template-purple-500"
               >
                 <ShoppingCart className="w-6 h-6" />
                 {product.stock <= 0 ? "Esgotado" : adding ? "Adicionando..." : "Adicionar ao Carrinho"}
               </button>
             </div>
-            <p className="text-center text-sm text-lunart-white/40 mt-4">
+            <p className="text-center text-sm text-template-white/40 mt-4">
               Restam apenas {product.stock} unidades.
             </p>
           </div>

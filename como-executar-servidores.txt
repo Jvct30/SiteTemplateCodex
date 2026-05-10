@@ -1,0 +1,11 @@
+Como executar os 2 servidores
+
+1. Backend
+cd C:\Projetos\SiteTemplateCodex\backend
+uv run uvicorn src.main:app --reload
+
+2. Frontend
+cd C:\Projetos\SiteTemplateCodex\frontend
+npm run dev
+
+Deixe cada servidor aberto em um terminal separado.

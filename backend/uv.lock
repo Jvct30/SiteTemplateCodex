@@ -354,7 +354,7 @@ wheels = [
 ]
 
 [[package]]
-name = "lunart-backend"
+name = "sitetemplatecodex-backend"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [

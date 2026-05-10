@@ -3,7 +3,7 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
-DEFAULT_DATABASE_URL = f"sqlite+aiosqlite:///{(BACKEND_DIR / 'lunart.db').as_posix()}"
+DEFAULT_DATABASE_URL = f"sqlite+aiosqlite:///{(BACKEND_DIR / 'template.db').as_posix()}"
 
 
 class Settings(BaseSettings):
@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     CLOUDINARY_CLOUD_NAME: str = ""
     CLOUDINARY_API_KEY: str = ""
     CLOUDINARY_API_SECRET: str = ""
-    CLOUDINARY_FOLDER: str = "lunart"
+    CLOUDINARY_FOLDER: str = "template"
     PAYMENT_PROVIDER: str = "mock"
     MOCK_PAYMENT_BASE_URL: str = "https://sandbox.mercadopago.com.br/checkout/v1/redirect"
     CORS_ORIGINS: list[str] = [

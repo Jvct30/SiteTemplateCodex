@@ -80,7 +80,7 @@ export default function CustomRequestChat() {
 
   return (
     <div className="max-w-3xl mx-auto w-full h-[calc(100vh-160px)] flex flex-col">
-      <Link href={isAdmin ? "/admin" : "/custom-requests"} className="text-lunart-pink-400 hover:text-lunart-pink-300 mb-4 inline-block">
+      <Link href={isAdmin ? "/admin" : "/custom-requests"} className="text-template-pink-400 hover:text-template-pink-300 mb-4 inline-block">
         ← Voltar
       </Link>
       
@@ -88,13 +88,13 @@ export default function CustomRequestChat() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-xl font-bold">{request.subject}</h1>
-            <div className="text-xs text-lunart-white/40">Status: {request.status}</div>
+            <div className="text-xs text-template-white/40">Status: {request.status}</div>
           </div>
           <div className="flex flex-wrap gap-2">
             {request.quoted_product_id && !isAdmin && request.status !== "closed" && (
               <Link
                 href={`/products/${request.quoted_product_id}`}
-                className="soft-button bg-lunart-pink-500 text-white hover:bg-lunart-pink-400"
+                className="soft-button bg-template-pink-500 text-white hover:bg-template-pink-400"
               >
                 Ver pedido para pagar
               </Link>
@@ -103,7 +103,7 @@ export default function CustomRequestChat() {
               <button
                 type="button"
                 onClick={() => setIsQuoteOpen((value) => !value)}
-                className="soft-button gap-2 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500"
+                className="soft-button gap-2 bg-template-purple-600 text-white hover:bg-template-purple-500"
               >
                 <PackagePlus className="h-4 w-4" />
                 Criar pedido
@@ -156,7 +156,7 @@ export default function CustomRequestChat() {
             <button
               type="submit"
               disabled={isCreatingQuote}
-              className="soft-button bg-lunart-pink-500 text-white hover:bg-lunart-pink-400"
+              className="soft-button bg-template-pink-500 text-white hover:bg-template-pink-400"
             >
               {isCreatingQuote ? "Criando..." : "Criar pedido para pagamento"}
             </button>
@@ -174,13 +174,13 @@ export default function CustomRequestChat() {
             <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[80%] rounded-lg p-4 ${
                 isSystem
-                  ? "mx-auto bg-lunart-white/10 text-center text-sm text-lunart-white/70"
+                  ? "mx-auto bg-template-white/10 text-center text-sm text-template-white/70"
                   : isMine 
-                  ? "bg-lunart-purple-600 rounded-tr-sm" 
-                  : "bg-lunart-surface-light border border-lunart-purple-500/30 rounded-tl-sm"
+                  ? "bg-template-purple-600 rounded-tr-sm"
+                  : "bg-template-surface-light border border-template-purple-500/30 rounded-tl-sm"
               }`}>
-                <div className="text-xs text-lunart-white/40 mb-1">
-                  {isSystem ? "Sistema" : isCustomer ? "Cliente" : "Lunart Admin"} • {formatDateTime(msg.created_at)}
+                <div className="text-xs text-template-white/40 mb-1">
+                  {isSystem ? "Sistema" : isCustomer ? "Cliente" : "Template Store Admin"} • {formatDateTime(msg.created_at)}
                 </div>
                 <div className="whitespace-pre-wrap">{msg.content}</div>
               </div>
@@ -204,7 +204,7 @@ export default function CustomRequestChat() {
           <button 
             type="submit"
             disabled={!content.trim() || isClosed}
-            className="flex h-12 w-12 items-center justify-center rounded-lg bg-lunart-pink-500 transition-colors hover:bg-lunart-pink-400 disabled:opacity-50"
+            className="flex h-12 w-12 items-center justify-center rounded-lg bg-template-pink-500 transition-colors hover:bg-template-pink-400 disabled:opacity-50"
             aria-label="Enviar mensagem"
           >
             <Send className="w-5 h-5" />

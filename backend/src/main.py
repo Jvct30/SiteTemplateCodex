@@ -38,7 +38,7 @@ from src.routers import (
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("lunart")
+logger = logging.getLogger("template")
 
 
 async def ensure_sqlite_columns(conn) -> None:
@@ -139,14 +139,14 @@ async def lifespan(app: FastAPI):
         if settings.DATABASE_URL.startswith("sqlite"):
             await ensure_sqlite_columns(conn)
         
-    logger.info("Lunart Backend Started 🚀")
+    logger.info("SiteTemplateCodex backend started")
     yield
     await engine.dispose()
-    logger.info("Lunart Backend Shutting Down 🌙")
+    logger.info("SiteTemplateCodex backend shutting down")
 
 app = FastAPI(
-    title="Lunart API",
-    description="API para o e-commerce celestial de artesanatos Lunart.",
+    title="SiteTemplateCodex API",
+    description="API para um template de e-commerce full stack.",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -209,4 +209,4 @@ app.include_router(admin_router.router)
 
 @app.get("/", tags=["health"])
 async def root():
-    return {"message": "Bem-vindo à API Lunart 🌙✨"}
+    return {"message": "Bem-vindo à API SiteTemplateCodex"}

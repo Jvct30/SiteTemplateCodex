@@ -71,10 +71,14 @@ class OrderService:
             raise BadRequestException("Status inválido")
 
         current_order = await self.get_order(order_id, is_admin=True)
+        if status == "shipped" and current_order.status not in {"paid", "shipped"}:
+            raise BadRequestException("Apenas pedidos pagos podem ser marcados como enviados")
+
         should_confirm_payment = (
             status == "paid"
             and current_order.status not in {"paid", "shipped", "delivered"}
         )
+        should_notify_shipment = status == "shipped" and current_order.status != "shipped"
 
         if should_confirm_payment:
             await self._confirm_payment(current_order)
@@ -82,7 +86,19 @@ class OrderService:
         order = await self.order_repo.update_status(order_id, status)
         if not order:
             raise NotFoundException("Pedido não encontrado")
+        if should_notify_shipment:
+            await self._notify_shipped(order)
         return order
+
+    async def _notify_shipped(self, order: Order) -> None:
+        if not order.support_request_id:
+            return
+
+        await self.custom_request_service.request_repo.add_message(
+            order.support_request_id,
+            "system",
+            f"Seu pedido #{order.id} foi marcado como enviado. Em breve ele chegará no endereço combinado.",
+        )
 
     async def _confirm_payment(self, order: Order) -> None:
         """Apply effects that must happen only after payment is confirmed."""

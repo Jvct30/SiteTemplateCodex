@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomRequests } from "@/hooks/useCustomRequests";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Megaphone, MessageSquare, PackageCheck, PackagePlus, Trash2 } from "lucide-react";
+import { Megaphone, MessageSquare, PackageCheck, PackagePlus, Trash2, Truck } from "lucide-react";
 import Link from "next/link";
 import { formatMoney } from "@/lib/formatters";
 import { formatDateTime } from "@/lib/dates";
@@ -37,6 +37,8 @@ export default function AdminPage() {
   
   const [uploading, setUploading] = useState(false);
   const [noticeText, setNoticeText] = useState("");
+  const [shippingOrderId, setShippingOrderId] = useState<number | null>(null);
+  const paidOrders = orders?.filter((order) => ["paid", "shipped"].includes(order.status)) ?? [];
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -89,6 +91,23 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Erro ao remover produto."));
+    }
+  };
+
+  const handleMarkOrderShipped = async (orderId: number) => {
+    try {
+      setShippingOrderId(orderId);
+      await api.put(`/admin/orders/${orderId}/status`, null, {
+        params: { status: "shipped" },
+      });
+      toast.success("Pedido marcado como enviado.");
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["custom-request"] });
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Erro ao marcar pedido como enviado."));
+    } finally {
+      setShippingOrderId(null);
     }
   };
 
@@ -282,11 +301,9 @@ export default function AdminPage() {
 
           {ordersLoading ? (
             <p className="text-sm text-lunart-white/60">Carregando pedidos...</p>
-          ) : orders?.filter((order) => order.status === "paid").length ? (
+          ) : paidOrders.length ? (
             <div className="flex flex-col gap-3">
-              {orders
-                .filter((order) => order.status === "paid")
-                .map((order) => (
+              {paidOrders.map((order) => (
                   <div
                     key={order.id}
                     className="rounded-lg border border-lunart-white/10 bg-lunart-surface-light p-4 transition-colors hover:border-lunart-pink-300"
@@ -297,10 +314,34 @@ export default function AdminPage() {
                           <h3 className="font-semibold">Pedido #{order.id}</h3>
                           <p className="text-xs text-lunart-white/45">{formatDateTime(order.created_at)}</p>
                         </div>
-                        <span className="text-lg font-bold text-lunart-pink-300">{formatMoney(order.total)}</span>
+                        <div className="flex flex-col gap-2 sm:items-end">
+                          <span className="text-lg font-bold text-lunart-pink-300">{formatMoney(order.total)}</span>
+                          <span className="w-fit rounded-full bg-lunart-white/10 px-3 py-1 text-xs font-bold uppercase text-lunart-pink-300">
+                            {order.status === "shipped" ? "Enviado" : "Pago"}
+                          </span>
+                        </div>
                       </div>
                       <div className="text-sm text-lunart-white/65">
                         {order.shipping_address_text || "Retirada na loja"}
+                      </div>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <Link
+                          href={order.support_request_id ? `/custom-requests/${order.support_request_id}` : `/profile/orders/${order.id}`}
+                          className="text-sm font-medium text-lunart-pink-300 hover:text-lunart-pink-200"
+                        >
+                          {order.support_request_id ? "Abrir chat do pedido" : "Ver detalhes do pedido"}
+                        </Link>
+                        {order.status === "paid" && (
+                          <button
+                            type="button"
+                            onClick={() => handleMarkOrderShipped(order.id)}
+                            disabled={shippingOrderId === order.id}
+                            className="soft-button gap-2 bg-lunart-purple-600 text-white hover:bg-lunart-purple-500"
+                          >
+                            <Truck className="h-4 w-4" />
+                            {shippingOrderId === order.id ? "Marcando..." : "Marcar pedido como enviado"}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

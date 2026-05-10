@@ -25,8 +25,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const res = await api.get<UserResponse>("/users/me");
           setUser(res.data);
-        } catch (error) {
-          console.error("Failed to restore session", error);
+        } catch {
+          setUser(null);
           localStorage.removeItem("access_token");
         }
       }

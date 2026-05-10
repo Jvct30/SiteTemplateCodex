@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className="scroll-smooth">
+    <html lang="pt-BR" className="scroll-smooth" data-scroll-behavior="smooth">
       <body
         className={`${inter.variable} ${outfit.variable} relative min-h-screen overflow-x-hidden font-sans antialiased`}
       >

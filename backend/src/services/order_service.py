@@ -16,6 +16,7 @@ from src.schemas.custom_request import CustomRequestCreate
 from src.schemas.order import CheckoutRequest
 from src.services.coupon_service import CouponService
 from src.services.custom_request_service import CustomRequestService
+from src.services.payment_service import PaymentService
 from src.services.shipping_service import ShippingService
 
 
@@ -35,6 +36,7 @@ class OrderService:
         self.product_repo = product_repo
         self.coupon_service = CouponService(coupon_repo)
         self.shipping_service = ShippingService()
+        self.payment_service = PaymentService()
         self.custom_request_service = CustomRequestService(custom_request_repo)
 
     async def get_order(self, order_id: int, user_id: int | None = None, is_admin: bool = False) -> Order:
@@ -240,8 +242,8 @@ class OrderService:
         await self.custom_request_service.update_status(followup.id, "answered")
         await self.order_repo.set_support_request(order.id, followup.id)
 
-        # 9. Mock Payment Link
-        order.payment_link = f"https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=mock_{order.id}"
+        # 9. Payment link. In development this is a mock provider.
+        order.payment_link = await self.payment_service.create_payment_link(order)
 
         # Reload fully populated
         return await self.get_order(order.id, is_admin=True)

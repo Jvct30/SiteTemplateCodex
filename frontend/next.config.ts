@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiImageHost = apiUrl ? new URL(apiUrl).hostname : null;
+
 const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
@@ -12,6 +15,14 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
+      ...(apiImageHost
+        ? [
+            {
+              protocol: "https" as const,
+              hostname: apiImageHost,
+            },
+          ]
+        : []),
     ],
   },
 };

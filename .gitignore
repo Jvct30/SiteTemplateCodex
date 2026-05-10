@@ -34,10 +34,12 @@ backend/venv/
 backend/env/
 backend/lunart.db
 backend/.env
+backend/.env.*
 backend/alembic.ini
 backend/*.egg-info/
 backend/dist/
 backend/build/
+backend/uploads/
 
 # =========================
 # Frontend (Next.js)
@@ -52,7 +54,9 @@ frontend/yarn-debug.log*
 frontend/yarn-error.log*
 frontend/.pnp.*
 frontend/.eslintcache
+frontend/.env
 frontend/.env.local
+frontend/.env.*.local
 frontend/.env.development.local
 frontend/.env.test.local
 frontend/.env.production.local

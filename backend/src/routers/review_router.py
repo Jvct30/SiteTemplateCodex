@@ -1,6 +1,3 @@
-import shutil
-import uuid
-
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +7,7 @@ from src.repositories.order_repo import OrderRepository
 from src.repositories.review_repo import ReviewRepository
 from src.schemas.review import ReviewCreate, ReviewResponse
 from src.services.review_service import ReviewService
+from src.services.upload_service import UploadService
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 
@@ -34,12 +32,7 @@ async def create_review(
 ):
     image_url = None
     if file and file.filename:
-        ext = file.filename.split(".")[-1]
-        filename = f"{uuid.uuid4()}.{ext}"
-        path = f"uploads/{filename}"
-        with open(path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        image_url = f"http://localhost:8000/static/{filename}"
+        image_url = await UploadService().upload_image(file, "reviews")
 
     return await service.create_review(
         order_id,

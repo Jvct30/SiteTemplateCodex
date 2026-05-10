@@ -1,6 +1,3 @@
-import shutil
-import uuid
-
 from fastapi import APIRouter, Depends, File, Query, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,6 +30,7 @@ from src.services.custom_request_service import CustomRequestService
 from src.services.message_service import MessageService
 from src.services.order_service import OrderService
 from src.services.product_service import ProductService
+from src.services.upload_service import UploadService
 
 # Require admin globally for all routes in this router
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
@@ -63,12 +61,8 @@ def get_custom_request_service(db: AsyncSession = Depends(get_db)) -> CustomRequ
 # -----------------
 @router.post("/upload-image")
 async def upload_image(file: UploadFile = File(...)):
-    ext = file.filename.split(".")[-1]
-    filename = f"{uuid.uuid4()}.{ext}"
-    path = f"uploads/{filename}"
-    with open(path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    return {"url": f"http://localhost:8000/static/{filename}"}
+    url = await UploadService().upload_image(file, "products")
+    return {"url": url}
 
 # -----------------
 # STORE NOTICE

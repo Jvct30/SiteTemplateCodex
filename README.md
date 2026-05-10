@@ -1,6 +1,6 @@
 # ⭐ Lunart — E-commerce Artesanal
 
-Lunart é uma plataforma de vendas de produtos artesanais inspirado em constelações, estrelas e no céu noturno. A plataforma permite a compra direta ou via carrinho, suporta cálculos de frete variados e possui um chat para pedidos customizados.
+Lunart é uma plataforma de vendas de produtos artesanais feitos a mão para presentear e decorar ambientes. A plataforma permite compra direta ou via carrinho, suporta cálculos de frete variados e possui um chat para pedidos customizados.
 
 ## 🚀 Tecnologias
 
@@ -12,7 +12,7 @@ Lunart é uma plataforma de vendas de produtos artesanais inspirado em constela�
 - **Migrações:** Alembic
 - **Autenticação:** JWT (`pyjwt`) e hash de senhas (`bcrypt`)
 - **Validações:** Pydantic V2 e `pydantic-br` (validação de CPF)
-- **Upload de Imagens:** Cloudinary (Integração Direta)
+- **Upload de Imagens:** Local em desenvolvimento ou Cloudinary via configuração
 
 ### Frontend
 - **Framework:** Next.js (App Router)
@@ -31,7 +31,69 @@ O **Backend** implementa os princípios do **SOLID** e utiliza o padrão **Servi
 - **Loja Virtual:** Listagem responsiva de produtos, detalhamento, controle de carrinho de compras e fluxo de checkout com simulador de pagamentos e cálculo de frete (Sedex, Retirada, Uber Flash).
 - **Pedidos Customizados:** Chat assíncrono integrado entre clientes e a administração da loja para a negociação e solicitação de peças artesanais personalizadas.
 - **Painel Administrativo:** Gestão intuitiva de produtos (com upload direto de fotos para nuvem), cupons de desconto, banners/anúncios rotativos da homepage e gerenciamento de status de pedidos.
-- **Design System Celestial:** Paleta visual fluida focada em tons de roxo, rosa e cores escuras (quase preto) com efeitos de glassmorphism e micro-animações estelares no CSS.
+- **Design System:** Paleta visual fluida focada em tons de roxo, rosa e cores escuras (quase preto), com glassmorphism e micro-animações sutis no CSS.
+
+## ⚙️ Configuração de Ambiente
+
+O projeto foi preparado para rodar em modo desenvolvimento sem custos e trocar serviços por produção com variáveis de ambiente.
+
+`.env.example` é o guia público do formato das variáveis. Ele não deve conter segredos reais. `.env` e `.env.local` são os arquivos privados usados na sua máquina ou configurados na plataforma de deploy.
+
+### Backend
+Copie `backend/.env.example` para `backend/.env`.
+
+- `DOMAIN`: domínio principal do projeto.
+- `DATABASE_URL`: usa SQLite por padrão. Para PostgreSQL, use uma URL `postgresql+asyncpg://...`.
+- `FRONTEND_URL`: URL pública do frontend.
+- `PUBLIC_API_URL`: URL pública do backend, usada para gerar links de arquivos locais.
+- `SECRET_KEY`: chave privada usada para assinar JWTs. Nunca commite o valor real.
+- `CORS_ORIGINS`: lista de domínios autorizados a chamar a API pelo navegador.
+- `UPLOAD_STORAGE`: `local` para desenvolvimento ou `cloudinary` para Cloudinary.
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: obrigatórios quando `UPLOAD_STORAGE=cloudinary`.
+- `PAYMENT_PROVIDER`: `mock` enquanto o pagamento real não estiver integrado.
+
+### Frontend
+Copie `frontend/.env.example` para `frontend/.env.local`.
+
+- `NEXT_PUBLIC_API_URL`: URL do backend que o frontend deve chamar.
+
+No Next.js, variáveis com prefixo `NEXT_PUBLIC_` ficam disponíveis no navegador. Use esse prefixo apenas para valores públicos, como URL da API. Nunca coloque segredos, senhas ou chaves privadas no frontend.
+
+### Diferença entre `.env` e `.env.local`
+
+- `backend/.env`: lido pelo FastAPI via `pydantic-settings`; guarda variáveis privadas do servidor, como `DATABASE_URL`, `SECRET_KEY` e chaves de serviços.
+- `frontend/.env.local`: lido pelo Next.js durante desenvolvimento; guarda variáveis do frontend. Neste projeto, ele contém apenas a URL pública da API.
+
+### Como Rodar
+
+Backend:
+```bash
+cd backend
+uv run uvicorn src.main:app --reload
+```
+
+Frontend:
+```bash
+cd frontend
+npm run dev
+```
+
+## ✅ Testes
+
+Backend:
+```bash
+cd backend
+uv run pytest
+uv run ruff check .
+```
+
+Frontend:
+```bash
+cd frontend
+npm test
+npm run lint
+npm run build
+```
   
 ## 📜 Licença
 Projeto de uso restrito e proprietário.

@@ -160,9 +160,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Static Files for Image Uploads
-os.makedirs("uploads", exist_ok=True)
-app.mount("/static", StaticFiles(directory="uploads"), name="static")
+# Static files are used only by the local upload storage.
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+app.mount("/static", StaticFiles(directory=settings.UPLOAD_DIR), name="static")
 
 # Global Exception Handlers
 @app.exception_handler(Exception)

@@ -82,6 +82,22 @@ npm run dev
 
 Keep each server running in a separate terminal.
 
+## Running With Docker
+
+To run the full project in containers:
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8000
+- API docs: http://localhost:8000/docs
+
+See `DOCKER.md` for the full Portuguese guide, including how to copy the project to another machine, change URLs for LAN access, inspect logs, and reset Docker volumes.
+
 ## Tests and Checks
 
 Backend:
